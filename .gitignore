@@ -1,0 +1,12 @@
+# ignore idea file
+.idea/
+
+# ignore eclipse file
+.settings/
+.classpath
+.project
+
+# global ignore file
+target/
+*.class
+*.log*
