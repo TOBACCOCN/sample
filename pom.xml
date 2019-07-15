@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.example</groupId>
-    <artifactId>demo</artifactId>
+    <artifactId>sample</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <dependencies>
@@ -172,6 +172,12 @@
             <groupId>com.yahoo.pulsar</groupId>
             <artifactId>pulsar-client</artifactId>
             <version>1.14</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>3.12.0</version>
         </dependency>
     </dependencies>
 
