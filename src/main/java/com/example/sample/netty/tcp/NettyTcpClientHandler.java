@@ -29,7 +29,7 @@ public class NettyTcpClientHandler extends SimpleChannelInboundHandler<String> {
         try {
             Map<String, String> map = JSON.parseObject(msg, Map.class);
             if (MESSAGE_CONNECT_SUCCESS.equals(map.get(MESSAGE))) {
-                NettyTcpClient.connected = true;
+                TcpChannelManager.connectSuccess(headerMap.get("requestId"), ctx.channel());
             }
         } catch (Exception e) {
             logger.info(">>>>> MESSAGE IS NOT JSON");
@@ -38,20 +38,18 @@ public class NettyTcpClientHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        logger.info(">>>>> START TO SEND MESSAGE: {}", headerMap);
         ctx.writeAndFlush(JSON.toJSONString(headerMap));
-        logger.info(">>>>> SEND MESSAGE DONE");
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) {
-        NettyTcpClient.connected = false;
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        super.channelInactive(ctx);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         ErrorPrintUtil.printErrorMsg(logger, cause);
-        NettyTcpClient.connected = false;
         ctx.close();
     }
+
 }

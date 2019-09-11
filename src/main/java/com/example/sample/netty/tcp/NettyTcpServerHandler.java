@@ -10,13 +10,14 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Map;
 
 public class NettyTcpServerHandler extends SimpleChannelInboundHandler<String> {
 
     private static Logger logger = LoggerFactory.getLogger(NettyTcpServerHandler.class);
 
-    private static final String ID = "id";
+    private static final String REQUEST_ID = "requestId";
     private static final String SIGN = "sign";
 
     @Override
@@ -24,12 +25,11 @@ public class NettyTcpServerHandler extends SimpleChannelInboundHandler<String> {
     public void channelRead0(ChannelHandlerContext ctx, String msg) {
         logger.info(">>>>> RECEIVING MESSAGE: {}", msg);
         Channel channel = ctx.channel();
-        String id = TcpChannelManager.getIdMap().get(channel.id());
-        if (id == null) {
+        if (TcpChannelManager.getRequestId(channel) == null) {
             try {
                 Map<String, String> map = JSON.parseObject(msg, Map.class);
                 if (SignUtil.checkSign(map, SIGN)) {
-                    TcpChannelManager.registerChannel(map.get(ID), ctx.channel());
+                    TcpChannelManager.registerChannel(map.get(REQUEST_ID), ctx.channel());
                     JSONObject json = new JSONObject();
                     json.put("message", "connect success");
                     channel.writeAndFlush(json.toString());
@@ -53,16 +53,22 @@ public class NettyTcpServerHandler extends SimpleChannelInboundHandler<String> {
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) {
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        super.channelInactive(ctx);
         TcpChannelManager.unregisterChannel(ctx.channel());
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        ErrorPrintUtil.printErrorMsg(logger, cause);
-        TcpChannelManager.unregisterChannel(ctx.channel());
+        if (cause instanceof IOException) {
+            logger.info(">>>>> CLIENT CLOSED");
+        } else {
+            ErrorPrintUtil.printErrorMsg(logger, cause);
+        }
+
         Channel channel = ctx.channel();
         if (channel != null) {
+            TcpChannelManager.unregisterChannel(channel);
             channel.close();
         }
     }

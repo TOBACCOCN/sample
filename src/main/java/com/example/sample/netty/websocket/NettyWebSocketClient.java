@@ -27,26 +27,36 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Queue;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeUnit;
 
 public class NettyWebSocketClient implements Runnable {
 
     private static Logger logger = LoggerFactory.getLogger(NettyWebSocketClient.class);
 
-    private static Queue<String> queue = new ConcurrentLinkedQueue<>();
-
-    private static Channel channel;
+    private Channel channel;
+    private Boolean channelInitialized = false;
 
     private String url;
-
     private Map<String, String> headerMap;
 
     public NettyWebSocketClient(String url, Map<String, String> headerMap) {
         super();
         this.url = url;
         this.headerMap = headerMap;
+    }
+
+    public Channel getChannel() {
+        if (!channelInitialized) {
+            synchronized (this) {
+                try {
+                    this.wait();
+                } catch (InterruptedException e) {
+                    ErrorPrintUtil.printErrorMsg(logger, e);
+                }
+            }
+        }
+        return channel;
     }
 
     public void run() {
@@ -60,7 +70,8 @@ public class NettyWebSocketClient implements Runnable {
             headerMap.forEach(defaultHttpHeaders::add);
             NettyWebSocketClientHandler handler =
                     new NettyWebSocketClientHandler(WebSocketClientHandshakerFactory.newHandshaker(uri,
-                            WebSocketVersion.V13, null, true, defaultHttpHeaders));
+                            WebSocketVersion.V13, null, true, defaultHttpHeaders),
+                            headerMap.get("requestId"));
             bootstrap = bootstrap.group(workerGroup).option(ChannelOption.SO_KEEPALIVE, true)
                     .channel(NioSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.DEBUG)).handler(new ChannelInitializer<SocketChannel>() {
@@ -76,39 +87,16 @@ public class NettyWebSocketClient implements Runnable {
                             pipeline.addLast(handler);
                         }
                     });
-            channel = bootstrap.connect(host, port).sync().channel();
+            synchronized (this) {
+                channel = bootstrap.connect(host, port).sync().channel();
+                this.notify();
+            }
+            channelInitialized = true;
             logger.info(">>>>> NETTY WEBSOCKET CLIENT START TO CONNECT SERVER, HOST: {}, PORT: {}", host, port);
 
             handler.handshakeFuture().sync();
 
-            // 发送心跳包
-            new Thread(() -> {
-                while (true) {
-                    try {
-                        if (channel != null) {
-                            channel.writeAndFlush(new PingWebSocketFrame());
-                        }
-                        Thread.sleep(1000 * 60 * 5);
-                    } catch (Exception e) {
-                        ErrorPrintUtil.printErrorMsg(logger, e);
-                    }
-                }
-            }).start();
-            // 发送 message
-            new Thread(() -> {
-                while (true) {
-                    try {
-                        if (channel != null) {
-                            channel.writeAndFlush(new TextWebSocketFrame(queue.poll()));
-                        }
-                        Thread.sleep(10);
-                    } catch (Exception e) {
-                        ErrorPrintUtil.printErrorMsg(logger, e);
-                    }
-                }
-            }).start();
-
-            // 线程要阻塞住，不然会退出
+            // // 线程要阻塞住，不然会退出
             Thread.currentThread().join();
         } catch (Exception e) {
             ErrorPrintUtil.printErrorMsg(logger, e);
@@ -120,13 +108,39 @@ public class NettyWebSocketClient implements Runnable {
     public static void main(String[] args) throws Exception {
         String url = "wss://127.0.0.1:8080";
         Map<String, String> headerMap = new HashMap<>();
-        headerMap.put("id", UUID.randomUUID().toString().replaceAll("-", ""));
+        String requestId = UUID.randomUUID().toString().replaceAll("-", "");
+        headerMap.put("requestId", requestId);
         headerMap.put("foo", "bar");
         headerMap.put("sign", SignUtil.generateSignature(headerMap, "sign"));
-        new Thread(new NettyWebSocketClient(url, headerMap)).start();
+        NettyWebSocketClient webSocketClient = new NettyWebSocketClient(url, headerMap);
+        // 连接服务端
+        new Thread(webSocketClient).start();
 
-        JSONObject json = new JSONObject();
-        json.put("foo", "bar");
-        queue.add(json.toString());
+        // 服务端响应连接成功后，再发送消息
+        Channel channel = webSocketClient.getChannel();
+        if (WebsocketChannelManager.isConnectSuccess(requestId, channel)) {
+            // 发送心跳包
+            new Thread(() -> {
+                JSONObject heart = new JSONObject();
+                int i = 0;
+                while (true) {
+                    try {
+                        channel.writeAndFlush(new PingWebSocketFrame());
+                        heart.put("heart", i++);
+                        channel.writeAndFlush(new TextWebSocketFrame(heart.toString()));
+                        TimeUnit.MINUTES.sleep(5);
+                        // TimeUnit.SECONDS.sleep(15);
+                    } catch (Exception e) {
+                        ErrorPrintUtil.printErrorMsg(logger, e);
+                    }
+                }
+            }).start();
+
+            // 发送消息给服务端
+            JSONObject message = new JSONObject();
+            message.put("message", "I am netty websocket client");
+            channel.writeAndFlush(new TextWebSocketFrame(message.toString()));
+        }
     }
+
 }

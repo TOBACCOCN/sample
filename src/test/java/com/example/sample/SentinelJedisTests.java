@@ -24,7 +24,7 @@ public class SentinelJedisTests {
         JedisSentinelPool redisSentinelJedisPool = new JedisSentinelPool(clusterName, sentinels, "foobared");
         try (Jedis jedis = redisSentinelJedisPool.getResource()) {
             //jedis.set("key", "aaa");
-            logger.info(">>>>> name: [{}]", jedis.get("name"));
+            logger.info(">>>>> NAME: [{}]", jedis.get("name"));
         } catch (Exception e) {
             e.printStackTrace();
         }

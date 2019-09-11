@@ -1,7 +1,7 @@
 package com.example.sample.netty.tcp;
 
+import com.example.sample.util.ErrorPrintUtil;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,39 +12,51 @@ public class TcpChannelManager {
 
     private static Logger logger = LoggerFactory.getLogger(TcpChannelManager.class);
 
-    private static Map<String, Channel> channelMap = new ConcurrentHashMap<>();
-    private static Map<ChannelId, String> idMap = new ConcurrentHashMap<>();
+    private static Map<String, Channel> requestId2ChannelMap = new ConcurrentHashMap<>();
+    private static Map<Channel, String> channel2RequestIdMap = new ConcurrentHashMap<>();
+    private static Map<String, Boolean> requestId2IsConnectSuccessMap = new ConcurrentHashMap<>();
 
-    public static Map<String, Channel> getChannelMap() {
-        return channelMap;
-    }
-
-    public static Map<ChannelId, String> getIdMap() {
-        return idMap;
-    }
-
-    public static void registerChannel(String id, Channel channel) {
-        logger.info(">>>>> REGISTER SERVER CHANNEL, ID: {}, CHANNELID: {}",
-                id, channel.id());
-        channelMap.put(id, channel);
-        idMap.put(channel.id(), id);
+    public static void registerChannel(String requestId, Channel channel) {
+        requestId2ChannelMap.put(requestId, channel);
+        channel2RequestIdMap.put(channel, requestId);
     }
 
     public static void unregisterChannel(Channel channel) {
-        String id = idMap.get(channel.id());
-        if (id != null) {
-            logger.info(">>>>> UNREGISTER CLIENT CHANNEL, CHANNELID: {}, ID: {}",
-                    channel.id(), id);
-            channelMap.remove(id);
-            idMap.remove(channel.id());
+        String requestId = channel2RequestIdMap.get(channel);
+        if (requestId != null) {
+            requestId2ChannelMap.remove(requestId);
+        }
+        channel2RequestIdMap.remove(channel);
+    }
+
+    public static Map<String, Channel> getRequestId2ChannelMap() {
+        return requestId2ChannelMap;
+    }
+
+    public static String getRequestId(Channel channel) {
+        return channel2RequestIdMap.get(channel);
+    }
+
+    public static Channel getChannel(String requestId) {
+        return requestId2ChannelMap.get(requestId);
+    }
+
+    public static void connectSuccess(String requestId, Channel channel) {
+        synchronized (channel) {
+            requestId2IsConnectSuccessMap.put(requestId, true);
+            channel.notify();
         }
     }
 
-    public static void sendMessage2Client(String id, String message) {
-        Channel channel = channelMap.get(id);
-        logger.info(">>>>> START TO SEND MESSAGE: {} TO CLIENT, ID: {}, CHANNELID: {}",
-                message, id, channel.id());
-        channel.writeAndFlush(message);
-        logger.info(">>>>> SEND MESSAGE DONE");
+    public static Boolean isConnectSuccess(String requestId, Channel channel) {
+        synchronized (channel) {
+            try {
+                channel.wait();
+            } catch (InterruptedException e) {
+                ErrorPrintUtil.printErrorMsg(logger, e);
+            }
+        }
+        return requestId2IsConnectSuccessMap.remove(requestId);
     }
+
 }

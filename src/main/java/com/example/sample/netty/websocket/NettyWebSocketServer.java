@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class NettyWebSocketServer implements Runnable {
 
@@ -78,22 +79,26 @@ public class NettyWebSocketServer implements Runnable {
         }
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         String protocol = "wss";
         String host = "127.0.0.1";
         int port = 8080;
+        // 启动服务端
         new Thread(new NettyWebSocketServer(protocol, host, port)).start();
 
+        // 模拟服务端主动给客户端发送消息
         new Thread(() -> {
-            Map<String, Channel> channelMap = WebsocketChannelManager.getChannelMap();
-            JSONObject json = new JSONObject();
-            json.put("message", "Hello! What's your name?");
+            Map<String, Channel> requestId2ChannelMap = WebsocketChannelManager.getRequestId2ChannelMap();
+            JSONObject message = new JSONObject();
+            message.put("message", "I am netty websocket server");
             try {
                 while (true) {
-                    if (channelMap.size() > 0) {
-                        channelMap.forEach((id, channel) -> channel.writeAndFlush(new TextWebSocketFrame(json.toString())));
+                    if (requestId2ChannelMap.size() > 0) {
+                        requestId2ChannelMap.forEach((id, channel) ->
+                                channel.writeAndFlush(new TextWebSocketFrame(message.toString())));
                     }
-                    Thread.sleep(1000 * 60 * 5);
+                    TimeUnit.MINUTES.sleep(5);
+                    // TimeUnit.SECONDS.sleep(15);
                 }
             } catch (InterruptedException e) {
                 ErrorPrintUtil.printErrorMsg(logger, e);

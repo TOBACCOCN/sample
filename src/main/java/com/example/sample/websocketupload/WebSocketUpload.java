@@ -6,73 +6,73 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 
 public class WebSocketUpload {
-	
-	public static void main(String[] args) {
-		// String fileName = "C:\\Users\\Administrator\\Desktop\\1.pcm";
-		// String recogFileName = "C:\\Users\\Administrator\\Desktop\\1.txt";
-		// new Thread(new UploadRunnable(fileName, recogFileName, "2", "fe90e80fb26d040e576d973c4eb4c9ca")).start();
 
-		File txtDir = new File("C:\\Users\\Administrator\\Desktop\\demo2");
-		File[] txtFiles = txtDir.listFiles();
-		File audioDir = new File("D:\\download\\中文英文语音数据\\中文30小时\\wav\\train\\S0003");
-		File[] audioFiles = audioDir.listFiles();
+    public static void main(String[] args) {
+        // String fileName = "C:\\Users\\Administrator\\Desktop\\1.pcm";
+        // String recogFileName = "C:\\Users\\Administrator\\Desktop\\1.txt";
+        // new Thread(new UploadRunnable(fileName, recogFileName, "2", "fe90e80fb26d040e576d973c4eb4c9ca")).start();
 
-		for (int i = 0; i < txtFiles.length; i++) {
-			System.out.println(audioFiles[i].getPath());
-			System.out.println(txtFiles[i].getPath());
-			new Thread(new UploadRunnable(audioFiles[i].getPath(), txtFiles[i].getPath(), "2", "fe90e80fb26d040e576d973c4eb4c9ca")).start();
-		}
-	}
+        File txtDir = new File("C:\\Users\\Administrator\\Desktop\\demo2");
+        File[] txtFiles = txtDir.listFiles();
+        File audioDir = new File("D:\\download\\中文英文语音数据\\中文30小时\\wav\\train\\S0003");
+        File[] audioFiles = audioDir.listFiles();
 
-	static class UploadRunnable implements Runnable {
+        for (int i = 0; i < txtFiles.length; i++) {
+            System.out.println(audioFiles[i].getPath());
+            System.out.println(txtFiles[i].getPath());
+            new Thread(new UploadRunnable(audioFiles[i].getPath(), txtFiles[i].getPath(), "2", "fe90e80fb26d040e576d973c4eb4c9ca")).start();
+        }
+    }
 
-		private Logger logger = LoggerFactory.getLogger(WebSocketUpload.class);
+    static class UploadRunnable implements Runnable {
 
-		private String fileName;
-		private String recogFileName;
-		private String userId;
-		private String token;
+        private Logger logger = LoggerFactory.getLogger(WebSocketUpload.class);
 
-		public UploadRunnable(String fileName, String recogFileName, String userId, String token) {
-			super();
-			this.fileName = fileName;
-			this.recogFileName = recogFileName;
-			this.userId = userId;
-			this.token = token;
-		}
+        private String fileName;
+        private String recogFileName;
+        private String userId;
+        private String token;
 
-		public String getFileName() {
-			return fileName;
-		}
+        public UploadRunnable(String fileName, String recogFileName, String userId, String token) {
+            super();
+            this.fileName = fileName;
+            this.recogFileName = recogFileName;
+            this.userId = userId;
+            this.token = token;
+        }
 
-		public void setFileName(String fileName) {
-			this.fileName = fileName;
-		}
+        public String getFileName() {
+            return fileName;
+        }
 
-		public String getUserId() {
-			return userId;
-		}
+        public void setFileName(String fileName) {
+            this.fileName = fileName;
+        }
 
-		public void setUserId(String userId) {
-			this.userId = userId;
-		}
+        public String getUserId() {
+            return userId;
+        }
 
-		public String getToken() {
-			return token;
-		}
+        public void setUserId(String userId) {
+            this.userId = userId;
+        }
 
-		public void setToken(String token) {
-			this.token = token;
-		}
+        public String getToken() {
+            return token;
+        }
 
-		@Override
-		public void run() {
-			WifiUploadClient uploadClient = new WifiUploadClient(fileName, recogFileName, userId, token);
-			int startToSend = uploadClient.startToSend();
-			logger.info("start to send: "+startToSend);
-		}
+        public void setToken(String token) {
+            this.token = token;
+        }
 
-	}
+        @Override
+        public void run() {
+            WifiUploadClient uploadClient = new WifiUploadClient(fileName, recogFileName, userId, token);
+            int startToSend = uploadClient.startToSend();
+            logger.info(">>>>> START TO SEND, CODE: [{}]", startToSend);
+        }
+
+    }
 
 }
 

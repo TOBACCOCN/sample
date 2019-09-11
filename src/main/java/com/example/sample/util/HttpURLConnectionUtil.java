@@ -95,9 +95,12 @@ public class HttpURLConnectionUtil {
      * @param url 请求地址
      * @return 响应消息
      */
-    public static String httpGet(String url) throws Exception {
+    public static String httpGet(String url, Map<String, String> headerMap) throws Exception {
         HttpURLConnection connection = getConnection(url);
         connection.setRequestMethod("GET");
+        if (headerMap != null) {
+            headerMap.forEach(connection::addRequestProperty);
+        }
         return getResponse(connection);
     }
 
@@ -114,7 +117,9 @@ public class HttpURLConnectionUtil {
         connection.setDoOutput(true);
         connection.setRequestMethod("POST");
         connection.setRequestProperty("charset", StandardCharsets.UTF_8.toString());
-        headerMap.forEach(connection::addRequestProperty);
+        if (headerMap != null) {
+            headerMap.forEach(connection::addRequestProperty);
+        }
         OutputStream outputStream = connection.getOutputStream();
         outputStream.write(param.getBytes());
         return getResponse(connection);
@@ -236,6 +241,10 @@ public class HttpURLConnectionUtil {
             // 2.下载静态资源时，从请求地址中获取文件名
             String filename = url.substring(url.lastIndexOf("/") + 1);
 
+            String externalName = filename.substring(filename.lastIndexOf("."));
+            if (!filename.matches("[^\\s\\\\/:\\*\\?\\\"<>\\|](\\x20|[^\\s\\\\/:\\*\\?\\\"<>\\|])*[^\\s\\\\/:\\*\\?\\\"<>\\|\\.]$")) {
+                filename = System.currentTimeMillis() + externalName;
+            }
             logger.info(">>>>> FILENAME: {}", filename);
             File file = new File(downloadDir + filename);
             if (!file.getParentFile().exists()) {

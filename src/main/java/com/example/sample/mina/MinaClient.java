@@ -1,17 +1,21 @@
 package com.example.sample.mina;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.example.sample.util.ErrorPrintUtil;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class MinaClient {
+
+    private static Logger logger = LoggerFactory.getLogger(MinaClient.class);
 
     private String host;
 
@@ -42,12 +46,29 @@ public class MinaClient {
         String host = "127.0.0.1";
         int port = 6007;
         String requestId = UUID.randomUUID().toString().replaceAll("-", "");
+        // 连接服务端
         new MinaClient(host, port, requestId).connect();
 
-        Map<String, String> messageMap = new HashMap<>();
-        messageMap.put("REQUESTID", requestId);
-        messageMap.put("foo", "bar");
-        String message = JSON.toJSONString(messageMap);
-        MinaClientHandler.sendMessage(requestId, message);
+        // 发送心跳包
+        JSONObject heart = new JSONObject();
+        new Thread(() -> {
+            int i = 0;
+            while (true) {
+                heart.put("heart", i++);
+                MinaClientHandler.sendMessage(requestId, heart.toString());
+                try {
+                    // TimeUnit.MINUTES.sleep(5);
+                    TimeUnit.SECONDS.sleep(5);
+                } catch (InterruptedException e) {
+                    ErrorPrintUtil.printErrorMsg(logger, e);
+                }
+            }
+        }).start();
+
+        // 发送消息
+        JSONObject message = new JSONObject();
+        message.put("requestId", requestId);
+        message.put("foo", "bar");
+        MinaClientHandler.sendMessage(requestId, message.toString());
     }
 }

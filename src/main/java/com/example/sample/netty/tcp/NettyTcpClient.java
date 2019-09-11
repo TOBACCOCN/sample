@@ -1,6 +1,6 @@
 package com.example.sample.netty.tcp;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.example.sample.util.ErrorPrintUtil;
 import com.example.sample.util.SignUtil;
 import io.netty.bootstrap.Bootstrap;
@@ -21,22 +21,36 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class NettyTcpClient implements Runnable {
 
     private static Logger logger = LoggerFactory.getLogger(NettyTcpClient.class);
 
-    private static Channel channel;
+    private Channel channel;
+    private static boolean channelInitialized = false;
     private String host;
     private int port;
     private Map<String, String> headerMap;
-    static boolean connected = false;
 
     public NettyTcpClient(String host, int port, Map<String, String> headerMap) {
         super();
         this.host = host;
         this.port = port;
         this.headerMap = headerMap;
+    }
+
+    public Channel getChannel() {
+        if (!channelInitialized) {
+            synchronized (this) {
+                try {
+                    this.wait();
+                } catch (InterruptedException e) {
+                    ErrorPrintUtil.printErrorMsg(logger, e);
+                }
+            }
+        }
+        return channel;
     }
 
     public void run() {
@@ -59,7 +73,11 @@ public class NettyTcpClient implements Runnable {
                     });
             ChannelFuture future = bootstrap.connect(host, port).sync();
             logger.info(">>>>> NETTY TCP CLIENT START TO CONNECT SERVER, HOST: {}, PORT: {}", host, port);
-            channel = future.channel();
+            synchronized (this) {
+                channel = future.channel();
+                this.notify();
+            }
+            channelInitialized = true;
             channel.closeFuture().sync();
         } catch (Exception e) {
             ErrorPrintUtil.printErrorMsg(logger, e);
@@ -71,27 +89,40 @@ public class NettyTcpClient implements Runnable {
     public static void main(String[] args) throws Exception {
         String host = "127.0.0.1";
         int port = 8080;
-        String id = UUID.randomUUID().toString().replaceAll("-", "");
         Map<String, String> headerMap = new HashMap<>();
-        headerMap.put("id", id);
+        String requestId = UUID.randomUUID().toString().replaceAll("-", "");
+        headerMap.put("requestId", requestId);
         headerMap.put("foo", "bar");
         headerMap.put("sign", SignUtil.generateSignature(headerMap, "sign"));
         // headerMap.put("sign", "sign");
-        new Thread(new NettyTcpClient(host, port, headerMap)).start();
+        NettyTcpClient tcpClient = new NettyTcpClient(host, port, headerMap);
+        // 连接服务端
+        new Thread(tcpClient).start();
 
-        Map<String, String> messageMap = new HashMap<>();
-        messageMap.put("foo", "bar");
-        messageMap.put("bar", "barz");
-        boolean notSend = true;
-        while (notSend) {
-            if (channel != null && connected) {
-                logger.info(">>>>> START TO SEND MESSAGE: {}", messageMap);
-                channel.writeAndFlush(JSON.toJSONString(messageMap));
-                logger.info(">>>>> SEND MESSAGE DONE");
-                notSend = false;
-            }
-            Thread.sleep(10);
+        Channel channel = tcpClient.getChannel();
+        if (TcpChannelManager.isConnectSuccess(requestId, channel)) {
+            new Thread(() -> {
+                // 发送心跳包
+                JSONObject heart = new JSONObject();
+                int i = 0;
+                while (true) {
+                    heart.put("heart", i++);
+                    channel.writeAndFlush(heart.toString());
+                    try {
+                        TimeUnit.MINUTES.sleep(5);
+                        // TimeUnit.SECONDS.sleep(15);
+                    } catch (InterruptedException e) {
+                        ErrorPrintUtil.printErrorMsg(logger, e);
+                    }
+                }
+            }).start();
+
+            // 发送消息给服务端
+            JSONObject message = new JSONObject();
+            message.put("message", "I am netty tcp client");
+            channel.writeAndFlush(message.toString());
         }
+
     }
 
 }

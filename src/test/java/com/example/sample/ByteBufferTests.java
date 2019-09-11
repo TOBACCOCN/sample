@@ -19,7 +19,7 @@ public class ByteBufferTests {
         ByteBuffer byteBuffer = ByteBuffer.allocate(102400);
         // byte[] bytes = new byte[byteBuffer.position()];
         // byteBuffer.get(bytes);
-        // logger.info(bytes.length);
+        // logger.info(">>>>> LENGTH: {}", bytes.length);
         logger.info(">>>>> POSITION: {}", byteBuffer.position());
         byteBuffer.put("sdafdasfasdfdasfdasf".getBytes());
         logger.info(">>>>> byteBuffer: {}", byteBuffer);

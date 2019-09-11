@@ -10,37 +10,43 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MinaClientHandler extends IoHandlerAdapter {
 
-	private static Logger logger = LoggerFactory.getLogger(MinaClientHandler.class);
+    private static Logger logger = LoggerFactory.getLogger(MinaClientHandler.class);
 
-	private static Map<String, IoSession> sessionMap = new ConcurrentHashMap<>();
-	private static Map<Long, String> sessionIdMap = new ConcurrentHashMap<>();
+    private static Map<String, IoSession> requestId2SessionMap = new ConcurrentHashMap<>();
+    private static Map<IoSession, String> session2RequestIdMap = new ConcurrentHashMap<>();
 
-	private String requestId;
+    private String requestId;
 
-	public MinaClientHandler(String requestId) {
-		this.requestId = requestId;
-	}
+    public MinaClientHandler(String requestId) {
+        this.requestId = requestId;
+    }
 
-	@Override
-	public void sessionCreated(IoSession session)  {
-		logger.info(">>>>> SESSION CREATED");
-		sessionMap.put(requestId, session);
-		sessionIdMap.put(session.getId(), requestId);
-	}
+    @Override
+    public void sessionCreated(IoSession session) {
+        requestId2SessionMap.put(requestId, session);
+        session2RequestIdMap.put(session, requestId);
+    }
 
-	@Override
-	public void messageReceived(IoSession session, Object message) {
-		logger.info(">>>>> RECEIVE MSG: {}, SESSION_ID: {}", message, session.getId());
-	}
+    @Override
+    public void messageReceived(IoSession session, Object message) {
+        logger.info(">>>>> RECEIVING MESSAGE: {}, SESSION_ID: {}", message, session.getId());
+    }
 
-	@Override
-	public void sessionClosed(IoSession session) {
-		logger.info(">>>>> SESSION CLOSED");
-		sessionMap.remove(sessionIdMap.get(session.getId()));
-		sessionIdMap.remove(session.getId());
-	}
+    @Override
+    public void sessionClosed(IoSession session) {
+        String requestId = session2RequestIdMap.get(session);
+        if (requestId != null) {
+            requestId2SessionMap.remove(requestId);
+        }
+        session2RequestIdMap.remove(session);
+    }
 
-	public static void sendMessage(String requestId, Object message) {
-		sessionMap.get(requestId).write(message);
-	}
+    public static void sendMessage(String requestId, Object message) {
+        IoSession session = requestId2SessionMap.get(requestId);
+        if (session != null) {
+            synchronized (session) {
+                session.write(message);
+            }
+        }
+    }
 }

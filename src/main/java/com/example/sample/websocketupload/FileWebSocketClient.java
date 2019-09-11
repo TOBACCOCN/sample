@@ -21,11 +21,11 @@ public class FileWebSocketClient extends WebSocketClient {
 
     private static Logger logger = LoggerFactory.getLogger(FileWebSocketClient.class);
 
-    public final static int CLIENT_STATE_REQUEST_SEND = 0;
-    public final static int CLIENT_STATE_SEND_FINISHED = 1;
-    public final static int SERVER_RESULT_MD5_FAILED = -3;
-    public final static int SERVER_RESULT_START_TO_RECEIVE = 1;
-    public final static int SERVER_RESULT_RECEIVE_SUCCESS = 2;
+    private final static int CLIENT_STATE_REQUEST_SEND = 0;
+    private final static int CLIENT_STATE_SEND_FINISHED = 1;
+    private final static int SERVER_RESULT_MD5_FAILED = -3;
+    private final static int SERVER_RESULT_START_TO_RECEIVE = 1;
+    private final static int SERVER_RESULT_RECEIVE_SUCCESS = 2;
 
     private SendDataThread mSendDataThread = null;
 
@@ -42,9 +42,9 @@ public class FileWebSocketClient extends WebSocketClient {
     private boolean audioUploaded = false;
     private boolean textUploaded = false;
 
-    //    public FileWebSocketClient(URI serverUri, Map<String, String> httpHeaders,String fileName, String userId, String token) {
-    public FileWebSocketClient(URI serverUri, Map<String, String> httpHeaders, String fileName, String recogFileName,
-                               String userId, String token) {
+    // public FileWebSocketClient(URI serverUri, Map<String, String> httpHeaders,String fileName, String userId, String token) {
+    FileWebSocketClient(URI serverUri, Map<String, String> httpHeaders, String fileName, String recogFileName,
+                        String userId, String token) {
         super(serverUri, httpHeaders);
         this.mfileName = fileName;
         this.recogFileName = recogFileName;
@@ -58,19 +58,19 @@ public class FileWebSocketClient extends WebSocketClient {
         mcurerrorcode = code;
     }
 
-    public int getCurErrorCode() {
+    int getCurErrorCode() {
         return mcurerrorcode;
     }
 
-    public boolean getIsSendSuccess() {
+    boolean getIsSendSuccess() {
         return msendSuccess;
     }
 
-    public void setHasConnecting(boolean flag) {
+    void setHasConnecting(boolean flag) {
         this.mHasConnecting = flag;
     }
 
-    public boolean getHasConnecting() {
+    boolean getHasConnecting() {
         return this.mHasConnecting;
     }
 
@@ -84,15 +84,15 @@ public class FileWebSocketClient extends WebSocketClient {
 
     @Override
     public void onOpen(ServerHandshake handshakedata) {
-        logger.info("onOpen(),filewebsocket,start");
+        logger.info(">>>>> onOpen(),filewebsocket,start");
         msendSuccess = false;
         setConnectedState(true);
         setHasConnecting(false);
 
         int trescode = requestSendFileToServer();
-        logger.info("onOpen(),filewebsocket,trescode=" + trescode);
+        logger.info(">>>>> onOpen(),filewebsocket,trescode={}", trescode);
         setCurErrorCode(trescode);
-        logger.info("onOpen(),filewebsocket,end");
+        logger.info(">>>>> onOpen(),filewebsocket,end");
     }
 
     private int requestSendFileToServer() {
@@ -113,7 +113,7 @@ public class FileWebSocketClient extends WebSocketClient {
             if (tfile.exists()) {
                 try {
                     String suffix = getSuffix(mfileName);
-                    logger.info("file suffix: " + suffix);
+                    logger.info(">>>>> file suffix: {}", suffix);
                     // String md5 = md5(tfile);
 
                     String md5 = Md5Utils.md5ForFile(tfile);
@@ -161,10 +161,10 @@ public class FileWebSocketClient extends WebSocketClient {
 
     @Override
     public void onMessage(String message) {
-        logger.info("onMessage(),filewebsocket,start");
-        logger.info("onMessage(),filewebsocket,message=" + message);
+        logger.info(">>>>> onMessage(),filewebsocket,start");
+        logger.info(">>>>> onMessage(),filewebsocket,message={}", message);
         int terrorcode = handleMessage(message);
-        logger.info("onMessage(),filewebsocket,terrorcode=" + terrorcode);
+        logger.info(">>>>> onMessage(),filewebsocket,terrorcode={}", terrorcode);
         setCurErrorCode(terrorcode);
         if (ErrorCode.Code_SERVER_RESULT_START_TO_RECEIVE == terrorcode) {
             // wait send file
@@ -178,14 +178,14 @@ public class FileWebSocketClient extends WebSocketClient {
             this.close();
         }
 
-        logger.info("onMessage(),filewebsocket,end");
+        logger.info(">>>>> onMessage(),filewebsocket,end");
     }
 
     private int handleMessage(String message) {
         if (null == message || "".equals(message)) {
             return ErrorCode.Code_NullParams;
         }
-        logger.info("handleMessage(),filewebsocket,message=" + message);
+        logger.info(">>>>> handleMessage(),filewebsocket,message={}",message);
         try {
             JSONObject json = new JSONObject(message);
             if (SERVER_RESULT_START_TO_RECEIVE == json.getInt("result")) {
@@ -227,10 +227,10 @@ public class FileWebSocketClient extends WebSocketClient {
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
-        logger.info("onClose(),filewebsocket,start");
-        logger.info("onClose(),filewebsocket,code=" + code);
-        logger.info("onClose(),filewebsocket,reason=" + reason);
-        logger.info("onClose(),filewebsocket,remote=" + remote);
+        logger.info(">>>>> onClose(),filewebsocket,start");
+        logger.info(">>>>> onClose(),filewebsocket,code={}", code);
+        logger.info(">>>>> onClose(),filewebsocket,reason={}", reason);
+        logger.info(">>>>> onClose(),filewebsocket,remote={}", remote);
         if (msendSuccess) {
             setCurErrorCode(ErrorCode.Code_OK);
         } else {
@@ -239,14 +239,14 @@ public class FileWebSocketClient extends WebSocketClient {
 
         setConnectedState(false);
         setHasConnecting(false);
-        logger.info("onClose(),filewebsocket,end");
+        logger.info(">>>>> onClose(),filewebsocket,end");
     }
 
     @Override
     public void onError(Exception ex) {
-        logger.info("onError(),filewebsocket,start");
+        logger.info(">>>>> onError(),filewebsocket,start");
         if (null != ex) {
-            logger.info("onError(),filewebsocket,ex=" + ex.toString());
+            logger.info(">>>>> onError(),filewebsocket,ex={}", ex.toString());
         }
         if (msendSuccess) {
             setCurErrorCode(ErrorCode.Code_OK);
@@ -256,7 +256,7 @@ public class FileWebSocketClient extends WebSocketClient {
 
         setConnectedState(false);
         setHasConnecting(false);
-        logger.info("onError(),filewebsocket,end");
+        logger.info(">>>>> onError(),filewebsocket,end");
     }
 
     public void shutDown() {
@@ -271,14 +271,14 @@ public class FileWebSocketClient extends WebSocketClient {
 
         private boolean run = true;
 
-        public void shutdown() {
+        void shutdown() {
             run = false;
         }
 
         private long position;
         private boolean isAudioFile;
 
-        public SendDataThread(long position, boolean isAudioFile) {
+        SendDataThread(long position, boolean isAudioFile) {
             super();
             this.position = position;
             this.isAudioFile = isAudioFile;
@@ -286,7 +286,7 @@ public class FileWebSocketClient extends WebSocketClient {
 
         @Override
         public void run() {
-            int terrorcode = ErrorCode.Code_OK;
+            int terrorcode;
             RandomAccessFile randomFile = null;
 
             if (null == mfileName || "".equals(mfileName)) {

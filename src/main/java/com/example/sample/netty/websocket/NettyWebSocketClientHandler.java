@@ -1,5 +1,6 @@
 package com.example.sample.netty.websocket;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.sample.util.ErrorPrintUtil;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -11,13 +12,18 @@ public class NettyWebSocketClientHandler extends SimpleChannelInboundHandler<Obj
 
     private static Logger logger = LoggerFactory.getLogger(NettyWebSocketClientHandler.class);
 
+    private static final String MESSAGE = "message";
+    private static final String MESSAGE_CONNECT_SUCCESS = "connect success";
+
     private WebSocketClientHandshaker handshaker;
+    private String requestId;
 
     private ChannelPromise handshakeFuture;
 
-    public NettyWebSocketClientHandler(WebSocketClientHandshaker handshaker) {
+    public NettyWebSocketClientHandler(WebSocketClientHandshaker handshaker, String requestId) {
         super();
         this.handshaker = handshaker;
+        this.requestId = requestId;
     }
 
     public ChannelFuture handshakeFuture() {
@@ -41,19 +47,23 @@ public class NettyWebSocketClientHandler extends SimpleChannelInboundHandler<Obj
         if (msg instanceof CloseWebSocketFrame) {
             logger.info(">>>>> CLOSE WEBSOCKET FROM SERVER");
             handshaker.close(channel, ((CloseWebSocketFrame) msg).retain());
-        } else if (msg instanceof PingWebSocketFrame) {
-            logger.info(">>>>> PING FROM SERVER");
-            ctx.write(new PongWebSocketFrame(((PingWebSocketFrame) msg).content().retain()));
+        } else if (msg instanceof PongWebSocketFrame) {
+            logger.info(">>>>> PONG FROM SERVER");
         } else if (msg instanceof TextWebSocketFrame) {
             String text = ((TextWebSocketFrame) msg).text();
             logger.info("TEXT_MESSAGE: {}", text);
+
+            JSONObject jsonObject = JSONObject.parseObject(text);
+            if (MESSAGE_CONNECT_SUCCESS.equals(jsonObject.getString(MESSAGE))) {
+                WebsocketChannelManager.connectSuccess(requestId, ctx.channel());
+            }
         } else if (msg instanceof BinaryWebSocketFrame) {
             // TODO
         }
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    public void channelActive(ChannelHandlerContext ctx) {
         handshaker.handshake(ctx.channel());
     }
 

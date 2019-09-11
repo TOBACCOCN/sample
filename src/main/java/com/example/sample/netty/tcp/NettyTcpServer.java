@@ -1,6 +1,6 @@
 package com.example.sample.netty.tcp;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.example.sample.util.ErrorPrintUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -17,9 +17,8 @@ import io.netty.handler.ssl.util.SelfSignedCertificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Clock;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class NettyTcpServer implements Runnable {
 
@@ -73,20 +72,24 @@ public class NettyTcpServer implements Runnable {
 
     public static void main(String[] args) {
         int port = 8080;
+        // 启动服务端
         new Thread(new NettyTcpServer(port)).start();
 
-        Map<String, String> messageMap = new HashMap<>();
-        String message = "Hello! What's your name?";
-        messageMap.put("message", message);
+        // 模拟服务端主动给客户端发送消息
         new Thread(() -> {
+            JSONObject message = new JSONObject();
+            message.put("message", "I am netty tcp server");
             while (true) {
-                Map<String, Channel> channelMap = TcpChannelManager.getChannelMap();
-                messageMap.put("time", "" + Clock.systemUTC().instant());
-                channelMap.keySet().forEach(id -> TcpChannelManager.sendMessage2Client(id, JSON.toJSONString(messageMap)));
-                try {
-                    Thread.sleep(1000 * 60 * 5);
-                } catch (InterruptedException e) {
-                    ErrorPrintUtil.printErrorMsg(logger, e);
+                Map<String, Channel> requestId2ChannelMap = TcpChannelManager.getRequestId2ChannelMap();
+                if (requestId2ChannelMap.size() > 0) {
+                    requestId2ChannelMap.keySet().forEach(requestId ->
+                            TcpChannelManager.getChannel(requestId).writeAndFlush(message.toString()));
+                    try {
+                        TimeUnit.MINUTES.sleep(5);
+                        // TimeUnit.SECONDS.sleep(15);
+                    } catch (InterruptedException e) {
+                        ErrorPrintUtil.printErrorMsg(logger, e);
+                    }
                 }
             }
         }).start();

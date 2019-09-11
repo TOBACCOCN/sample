@@ -22,12 +22,12 @@ public class KeyExpiredListenerTests {
 
         @Override
         public void onPSubscribe(String pattern, int subscribedChannels) {
-            logger.info("onPSubscribe {} {}", pattern, subscribedChannels);
+            logger.info(">>>>> onPSubscribe {} {}", pattern, subscribedChannels);
         }
 
         @Override
         public void onPMessage(String pattern, String channel, String message) {
-            logger.info("pattern = [{}], channel = [{}], message = [{}]", pattern, channel, message);
+            logger.info(">>>>> pattern = [{}], channel = [{}], message = [{}]", pattern, channel, message);
         }
 
     }

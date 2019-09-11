@@ -11,6 +11,7 @@ import io.netty.handler.codec.http.websocketx.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,16 +29,14 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Obj
     private static final String WEBSOCKET_DEFAULT_HEADER_WEBSOCKET_VERSION = "sec-websocket-version";
     private static final String WEBSOCKET_DEFAULT_HEADER_WEBSOCKET_EXTENSIONS = "sec-websocket-extensions";
     private static final String WEBSOCKET_DEFAULT_HEADER_WEBSOCKET_ORIGIN = "sec-websocket-origin";
-    private static final String ID = "id";
+    private static final String REQUEST_ID = "requestId";
     private static final String SIGN = "sign";
     private static final String UPGRADE = "Upgrade";
 
     private static final String WEBSOCKET = "websocket";
 
     private String protocol;
-
     private String host;
-
     private int port;
 
     public NettyWebSocketServerHandler(String protocol, String host, int port) {
@@ -83,13 +82,15 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Obj
             removeWebsocketDefaultHeader(map);
             if (SignUtil.checkSign(map, SIGN)) {
                 handshaker.handshake(channel, request);
-                WebsocketChannelManager.registerChannel(map.get(ID), channel);
+                WebsocketChannelManager.registerChannel(map.get(REQUEST_ID), channel);
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("message", "connect success");
+                channel.writeAndFlush(new TextWebSocketFrame(jsonObject.toString()));
             } else {
                 handshaker.close(channel, new CloseWebSocketFrame());
             }
         }
     }
-
 
     private void removeWebsocketDefaultHeader(Map<String, String> map) {
         map.remove(WEBSOCKET_DEFAULT_HEADER_CONNECTION);
@@ -104,8 +105,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Obj
 
     private void handleWebsocketFrame(ChannelHandlerContext ctx, WebSocketFrame frame) {
         Channel channel = ctx.channel();
-        String id = WebsocketChannelManager.getIdMap().get(channel.id());
-        if (id == null) {
+        if (WebsocketChannelManager.getRequestId(channel) == null) {
             JSONObject json = new JSONObject();
             json.put("message", "no permission");
             channel.writeAndFlush(json.toString());
@@ -119,32 +119,37 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Obj
                 ctx.writeAndFlush(new PongWebSocketFrame(frame.content().retain()));
             } else if (frame instanceof TextWebSocketFrame) {
                 String text = ((TextWebSocketFrame) frame).text();
-                logger.info("TEXT_MESSAGE: {}", text);
-                // TODO
+                logger.info(">>>>> TEXT_MESSAGE: {}", text);
             } else if (frame instanceof BinaryWebSocketFrame) {
-                logger.info("BINARY_MESSAGE_LENGTH: {}", frame.content().readableBytes());
+                logger.info(">>>>> BINARY_MESSAGE_LENGTH: {}", frame.content().readableBytes());
                 // TODO
             }
         }
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    public void channelActive(ChannelHandlerContext ctx) {
         logger.info(">>>>> CLIENT CONNECTED, CHANNELID:{}, ADDRESS: {}",
                 ctx.channel().id(), ctx.channel().remoteAddress());
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) {
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        super.channelInactive(ctx);
         WebsocketChannelManager.unregisterChannel(ctx.channel());
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        ErrorPrintUtil.printErrorMsg(logger, cause);
-        WebsocketChannelManager.unregisterChannel(ctx.channel());
+        if (cause instanceof IOException) {
+            logger.info(">>>>> CLIENT CLOSED");
+        } else {
+            ErrorPrintUtil.printErrorMsg(logger, cause);
+        }
+
         Channel channel = ctx.channel();
         if (channel != null) {
+            WebsocketChannelManager.unregisterChannel(channel);
             channel.close();
         }
     }

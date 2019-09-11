@@ -19,7 +19,7 @@ public class WifiUploadClient {
     private String mtoken;
     private FileWebSocketClient mclient;
 
-    public WifiUploadClient(String fileName, String recogFileName, String userId, String token) {
+    WifiUploadClient(String fileName, String recogFileName, String userId, String token) {
         super();
         this.mfileName = fileName;
         this.recogFileName = recogFileName;
@@ -32,7 +32,7 @@ public class WifiUploadClient {
     private static final String Item_userId = "userId";
     private static final String Item_token = "token";
 
-    public int startToSend() {
+    int startToSend() {
         if (null == mfileName || "".equals(mfileName)) {
             return ErrorCode.Code_NullParams;
         }

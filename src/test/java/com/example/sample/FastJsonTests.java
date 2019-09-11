@@ -25,11 +25,9 @@ public class FastJsonTests {
         List<Zhang> zhangs = JSON.parseArray("[{\"name\":\"zyh\"}, {\"name\":\"zys\"}]", Zhang.class);
         logger.info(">>>>> zhangs: {}", zhangs);
 
-        logger.info(JSON.toJSONString(zhang));
-        logger.info(JSON.toJSONString(zhangs));
+        logger.info(">>>>> object-jsonString: {}", JSON.toJSONString(zhang));
+        logger.info(">>>>> list-jsonString: {}", JSON.toJSONString(zhangs));
 
-        logger.info(jsonObject.toJSONString());
-        logger.info(jsonArray.toJSONString());
     }
 
     static class Zhang {

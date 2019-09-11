@@ -54,7 +54,7 @@ public class AudioUtil {
      * @param pcmPath pcm 音频文件路径
      * @param wavPath wav 音频文件路径
      */
-    private static void pcm2Wav(String pcmPath, String wavPath) throws Exception {
+    public static void pcm2Wav(String pcmPath, String wavPath) throws Exception {
         FileInputStream fis = new FileInputStream(pcmPath);
         FileOutputStream fos = new FileOutputStream(wavPath);
 
@@ -74,6 +74,7 @@ public class AudioUtil {
         short blockAlign = (short) (channels * bitsPerSample);
         // int sampleRate = 8000;
         int sampleRate = 16000;
+        // int sampleRate = 24000;
         // int sampleRate = 44100;
         int avgBytesPerSec = blockAlign * sampleRate;
         int dataHdrLength = pcmLength;

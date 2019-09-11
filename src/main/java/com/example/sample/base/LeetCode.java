@@ -16,6 +16,25 @@ public class LeetCode {
 
     private static Logger logger = LoggerFactory.getLogger(LeetCode.class);
 
+    private static int assignCookies(int[] children, int[] cookies) {
+        Arrays.sort(children);
+        logger.info(">>>>> SORTED CHILDREN: {}", children);
+        Arrays.sort(cookies);
+        logger.info(">>>>> SORTED COOKIES: {}", cookies);
+        int result = 0;
+        int i = 0, j = 0;
+        while (i < children.length && j < cookies.length) {
+            if (children[i] <= cookies[j]) {
+                result += 1;
+                i++;
+                j++;
+            } else {
+                j++;
+            }
+        }
+        return result;
+    }
+
     /**
      * Generate combinations.
      *
@@ -79,7 +98,7 @@ public class LeetCode {
         List<int[]> indexPairs = twoSum(array, target);
         logger.info(">>>>> ------VALUE------");
         for (int[] indexArray : indexPairs) {
-            logger.info("[{}, {}]", array[indexArray[0]], array[indexArray[1]]);
+            logger.info(">>>>> [{}, {}]", array[indexArray[0]], array[indexArray[1]]);
         }
         return indexPairs;
     }
@@ -145,7 +164,7 @@ public class LeetCode {
         int max = 1000000;
         List<int[]> list = LeetCode.doTwoSum(count, target, max);
         logger.info(">>>>> ------INDEX------");
-        list.forEach(array -> logger.info("[{}, {}]", array[0], array[1]));
+        list.forEach(array -> logger.info(">>>>> [{}, {}]", array[0], array[1]));
     }
 
     @Test
@@ -161,10 +180,40 @@ public class LeetCode {
         combination(result, "", 15, 0);
         long end = System.currentTimeMillis();
         // for (String string : list) {
-        //     logger.info(string);
+        //     logger.info(">>>>> {}", string);
         // }
         logger.info(">>>>> SIZE: [{}]", result.size());
         logger.info(">>>>> COST: [{}] ms", end - begin);
+    }
+
+    @Test
+    public void assignCookies() {
+        // 测试时只需修改此值
+        int max = 100;
+        Random random = new Random((int) (Math.random() * max) + 1);
+
+        int[] children = generateArray(random, max);
+        logger.info(">>>>> CHILDREN: {}", children);
+
+        int[] cookies = generateArray(random, max);
+        logger.info(">>>>> COOKIES: {}", cookies);
+
+        long start = System.currentTimeMillis();
+        int result = assignCookies(children, cookies);
+        logger.info(">>>>> COST: {} ms", System.currentTimeMillis() - start);
+        logger.info(">>>>> RESULT: {}", result);
+    }
+
+    private int[] generateArray(Random random, int max) {
+        int length = random.nextInt((int) (Math.random() * max) + 1);
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i < length; i++) {
+            int number = random.nextInt((int) (Math.random() * max) + 1);
+            if (number > 0) {
+                list.add(number);
+            }
+        }
+        return list.stream().mapToInt(i -> i).toArray();
     }
 
 }
