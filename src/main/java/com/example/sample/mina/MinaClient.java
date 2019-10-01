@@ -2,20 +2,20 @@ package com.example.sample.mina;
 
 import com.alibaba.fastjson.JSONObject;
 import com.example.sample.util.ErrorPrintUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class MinaClient {
 
-    private static Logger logger = LoggerFactory.getLogger(MinaClient.class);
+    // private static Logger logger = LoggerFactory.getLogger(MinaClient.class);
 
     private String host;
 
@@ -60,7 +60,7 @@ public class MinaClient {
                     // TimeUnit.MINUTES.sleep(5);
                     TimeUnit.SECONDS.sleep(5);
                 } catch (InterruptedException e) {
-                    ErrorPrintUtil.printErrorMsg(logger, e);
+                    ErrorPrintUtil.printErrorMsg(log, e);
                 }
             }
         }).start();

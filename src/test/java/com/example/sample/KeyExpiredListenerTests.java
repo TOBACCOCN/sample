@@ -1,14 +1,14 @@
 package com.example.sample;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
+@Slf4j
 public class KeyExpiredListenerTests {
 
-    private static Logger logger = LoggerFactory.getLogger(KeyExpiredListenerTests.class);
+    // private static Logger logger = LoggerFactory.getLogger(KeyExpiredListenerTests.class);
 
     @Test
     public void test() {
@@ -22,12 +22,12 @@ public class KeyExpiredListenerTests {
 
         @Override
         public void onPSubscribe(String pattern, int subscribedChannels) {
-            logger.info(">>>>> onPSubscribe {} {}", pattern, subscribedChannels);
+            log.info(">>>>> onPSubscribe {} {}", pattern, subscribedChannels);
         }
 
         @Override
         public void onPMessage(String pattern, String channel, String message) {
-            logger.info(">>>>> pattern = [{}], channel = [{}], message = [{}]", pattern, channel, message);
+            log.info(">>>>> pattern = [{}], channel = [{}], message = [{}]", pattern, channel, message);
         }
 
     }

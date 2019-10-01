@@ -1,15 +1,15 @@
 package com.example.sample.trans.microsoft;
 
 import com.microsoft.cognitiveservices.speech.audio.PullAudioInputStreamCallback;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.InputStream;
 
+@Slf4j
 public class WavStream extends PullAudioInputStreamCallback {
 
-    private static Logger logger = LoggerFactory.getLogger(WavStream.class);
+    // private static Logger logger = LoggerFactory.getLogger(WavStream.class);
 
     private final InputStream stream;
 
@@ -29,7 +29,7 @@ public class WavStream extends PullAudioInputStreamCallback {
         try {
             ret = this.stream.read(dataBuffer, 0, dataBuffer.length);
         } catch (Exception ex) {
-            logger.info("Read " + ex);
+            log.info("Read " + ex);
         }
 
         return (int) Math.max(0, ret);

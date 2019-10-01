@@ -1,7 +1,6 @@
 package com.example.sample.trans.youdao;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.websocket.*;
 import java.io.FileInputStream;
@@ -13,9 +12,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
+@Slf4j
 public class YoudaoSpeechTranslation {
 
-    private static Logger logger = LoggerFactory.getLogger(YoudaoSpeechTranslation.class);
+    // private static Logger logger = LoggerFactory.getLogger(YoudaoSpeechTranslation.class);
 
     public static void main(String[] args) throws Exception {
         String appKey = "";
@@ -81,13 +81,13 @@ public class YoudaoSpeechTranslation {
 
         @OnOpen
         public void onOpen(Session session) {
-            logger.info(">>>>> ON_OPEN");
+            log.info(">>>>> ON_OPEN");
             this.session = session;
         }
 
         @OnMessage
         public void onMessage(String message) throws IOException {
-            logger.info(">>>>> ON_MESSAGE: {}", message);
+            log.info(">>>>> ON_MESSAGE: {}", message);
             if (message.contains("\"errorCode\":\"304\"")) {
                 onClose();
             }
@@ -96,7 +96,7 @@ public class YoudaoSpeechTranslation {
 
         @OnError
         public void onError(Throwable throwable) {
-            logger.info(">>>>> WEBSOCKET ERROR OCCURRED");
+            log.info(">>>>> WEBSOCKET ERROR OCCURRED");
         }
 
         @OnClose
@@ -104,7 +104,7 @@ public class YoudaoSpeechTranslation {
             if (this.session.isOpen()) {
                 this.session.close();
             }
-            logger.info(">>>>> SESSION CLOSE");
+            log.info(">>>>> SESSION CLOSE");
             System.exit(0);
         }
 

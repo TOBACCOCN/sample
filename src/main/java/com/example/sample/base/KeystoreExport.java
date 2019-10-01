@@ -1,7 +1,6 @@
 package com.example.sample.base;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,9 +16,10 @@ import java.util.Base64;
  *
  * @author zhangyonghong
  */
+@Slf4j
 public class KeystoreExport {
 
-    private static Logger logger = LoggerFactory.getLogger(KeystoreExport.class);
+    // private static Logger logger = LoggerFactory.getLogger(KeystoreExport.class);
 
     public static void main(String[] args) throws Exception {
         String keystorePath = "C:\\Users\\Administrator\\Desktop\\tomcat.keystore";
@@ -29,7 +29,7 @@ public class KeystoreExport {
         String privatePath = "C:\\Users\\Administrator\\Desktop\\private.key";
         String publicPath = "C:\\Users\\Administrator\\Desktop\\public.key";
         export(keystorePath, password, alias, certPath, privatePath, publicPath);
-        logger.info(">>>>> DONE");
+        log.info(">>>>> DONE");
     }
 
     private static void export(String keystorePath, String password, String alias, String certPath, String privatePath, String publicPath) throws Exception {

@@ -8,14 +8,14 @@ import com.aliyuncs.alimt.model.v20181012.TranslateECommerceResponse;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.example.sample.util.ErrorPrintUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.URLEncoder;
 
+@Slf4j
 public class AliyunTranslation {
 
-    private static Logger logger = LoggerFactory.getLogger(AliyunTranslation.class);
+    // private static Logger logger = LoggerFactory.getLogger(AliyunTranslation.class);
 
     public static void main(String[] args) {
         // 使用您的阿里云访问密钥 AccessKeyId
@@ -47,9 +47,9 @@ public class AliyunTranslation {
             //目标语言
             eCommerceRequest.setTargetLanguage("en");
             TranslateECommerceResponse eCommerceResponse = client.getAcsResponse(eCommerceRequest);
-            logger.info(">>>>> TRANSLATION_RESULT: {}", JSONObject.toJSON(eCommerceResponse));
+            log.info(">>>>> TRANSLATION_RESULT: {}", JSONObject.toJSON(eCommerceResponse));
         } catch (Exception e) {
-            ErrorPrintUtil.printErrorMsg(logger, e);
+            ErrorPrintUtil.printErrorMsg(log, e);
         }
     }
 }

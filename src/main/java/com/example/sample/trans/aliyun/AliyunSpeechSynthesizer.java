@@ -8,17 +8,17 @@ import com.alibaba.nls.client.protocol.tts.SpeechSynthesizer;
 import com.alibaba.nls.client.protocol.tts.SpeechSynthesizerListener;
 import com.alibaba.nls.client.protocol.tts.SpeechSynthesizerResponse;
 import com.example.sample.util.ErrorPrintUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+@Slf4j
 public class AliyunSpeechSynthesizer {
 
-    private static final Logger logger = LoggerFactory.getLogger(AliyunSpeechSynthesizer.class);
+    // private static final Logger logger = LoggerFactory.getLogger(AliyunSpeechSynthesizer.class);
     private static long startTime;
     private String appKey;
     private NlsClient client;
@@ -32,8 +32,8 @@ public class AliyunSpeechSynthesizer {
             accessToken.apply();
             String token = accessToken.getToken();
             long now = System.currentTimeMillis() / 1000;
-            logger.info(">>>>> TOKEN: [{}], EXPIRE_TIME: [{}]", token, accessToken.getExpireTime());
-            logger.info(">>>>> TOKEN VALID_DURATION: {}", accessToken.getExpireTime() - now);
+            log.info(">>>>> TOKEN: [{}], EXPIRE_TIME: [{}]", token, accessToken.getExpireTime());
+            log.info(">>>>> TOKEN VALID_DURATION: {}", accessToken.getExpireTime() - now);
             // 创建 NlsClient 实例,应用全局创建一个即可，用户指定服务地址
             if (url.isEmpty()) {
                 client = new NlsClient(accessToken.getToken());
@@ -41,7 +41,7 @@ public class AliyunSpeechSynthesizer {
                 client = new NlsClient(url, accessToken.getToken());
             }
         } catch (IOException e) {
-            ErrorPrintUtil.printErrorMsg(logger, e);
+            ErrorPrintUtil.printErrorMsg(log, e);
         }
     }
 
@@ -57,7 +57,7 @@ public class AliyunSpeechSynthesizer {
                 @Override
                 public void onComplete(SpeechSynthesizerResponse response) {
                     // 当 onComplete 时表示所有TTS数据已经接收完成，因此这个是整个合成延迟，该延迟可能较大，未必满足实时场景
-                    logger.info(">>>>> ON_COMPLETE, NAME: {}, status: {}, output_FILE: {}",
+                    log.info(">>>>> ON_COMPLETE, NAME: {}, status: {}, output_FILE: {}",
                             response.getName(), response.getStatus(), file.getAbsolutePath());
                 }
 
@@ -69,20 +69,20 @@ public class AliyunSpeechSynthesizer {
                             // 此处是计算首包语音流的延迟，收到第一包语音流时，即可以进行语音播放，以提升响应速度（特别是实时交互场景下）
                             firstRecvBinary = false;
                             long now = System.currentTimeMillis();
-                            logger.info(">>>>> TTS FIRST LATENCY: [{}] MS", now - AliyunSpeechSynthesizer.startTime);
+                            log.info(">>>>> TTS FIRST LATENCY: [{}] MS", now - AliyunSpeechSynthesizer.startTime);
                         }
                         byte[] bytesArray = new byte[message.remaining()];
                         message.get(bytesArray, 0, bytesArray.length);
                         fos.write(bytesArray);
                     } catch (IOException e) {
-                        ErrorPrintUtil.printErrorMsg(logger, e);
+                        ErrorPrintUtil.printErrorMsg(log, e);
                     }
                 }
 
                 @Override
                 public void onFail(SpeechSynthesizerResponse response) {
                     // task_id 很重要，是调用方和服务端通信的唯一 ID 标识，当遇到问题时，需要提供此 task_id 以便排查
-                    logger.info(">>>>> ON_FAIL, TASK_ID: {}, STATUS: {}, STATUS_TEXT: {}", response.getTaskId(),
+                    log.info(">>>>> ON_FAIL, TASK_ID: {}, STATUS: {}, STATUS_TEXT: {}", response.getTaskId(),
                             // 状态码 20000000 表示识别成功
                             response.getStatus(),
                             // 错误信息
@@ -90,7 +90,7 @@ public class AliyunSpeechSynthesizer {
                 }
             };
         } catch (Exception e) {
-            ErrorPrintUtil.printErrorMsg(logger, e);
+            ErrorPrintUtil.printErrorMsg(log, e);
         }
         return listener;
     }
@@ -116,13 +116,13 @@ public class AliyunSpeechSynthesizer {
             // 此方法将以上参数设置序列化为 json 发送给服务端,并等待服务端确认
             long start = System.currentTimeMillis();
             synthesizer.start();
-            logger.info(">>>>> TTS START LATENCY: [{}] MS", System.currentTimeMillis() - start);
+            log.info(">>>>> TTS START LATENCY: [{}] MS", System.currentTimeMillis() - start);
             AliyunSpeechSynthesizer.startTime = System.currentTimeMillis();
             // 等待语音合成结束
             synthesizer.waitForComplete();
-            logger.info(">>>>> TTS STOP LATENCY: [{}] MS", System.currentTimeMillis() - start);
+            log.info(">>>>> TTS STOP LATENCY: [{}] MS", System.currentTimeMillis() - start);
         } catch (Exception e) {
-            ErrorPrintUtil.printErrorMsg(logger, e);
+            ErrorPrintUtil.printErrorMsg(log, e);
         } finally {
             // 关闭连接
             if (null != synthesizer) {

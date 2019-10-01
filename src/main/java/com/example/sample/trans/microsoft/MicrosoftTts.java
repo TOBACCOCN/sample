@@ -1,7 +1,6 @@
 package com.example.sample.trans.microsoft;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -18,13 +17,14 @@ import java.io.*;
 import java.net.URL;
 
 // https://github.com/Azure-Samples/Cognitive-Speech-TTS/tree/master/Samples-Http/Java/TTSSample/
+@Slf4j
 public class MicrosoftTts {
 
-    private static Logger logger = LoggerFactory.getLogger(MicrosoftTts.class);
+    // private static Logger logger = LoggerFactory.getLogger(MicrosoftTts.class);
 
     public static void main(String[] args) throws Exception {
         String accessToken = getAccessToken();
-        logger.info(">>>>> ACCESS_TOKEN: [{}]", accessToken);
+        log.info(">>>>> ACCESS_TOKEN: [{}]", accessToken);
 
         String text = "This is a demo to call microsoft text to speech service in java.";
 

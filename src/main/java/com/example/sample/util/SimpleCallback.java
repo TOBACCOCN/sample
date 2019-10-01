@@ -1,13 +1,13 @@
 package com.example.sample.util;
 
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+@Slf4j
 public class SimpleCallback implements Callback {
 
     private Response response;
@@ -20,11 +20,11 @@ public class SimpleCallback implements Callback {
         this.response = response;
     }
 
-    private static Logger logger = LoggerFactory.getLogger(SimpleCallback.class);
+    // private static Logger logger = LoggerFactory.getLogger(SimpleCallback.class);
 
     @Override
     public void onFailure(Call call, IOException e) {
-        ErrorPrintUtil.printErrorMsg(logger, e);
+        ErrorPrintUtil.printErrorMsg(log, e);
     }
 
     @Override

@@ -1,12 +1,12 @@
 package com.example.sample;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+@Slf4j
 public class ThreadTests {
 
-    private static Logger logger = LoggerFactory.getLogger(ThreadTests.class);
+    // private static Logger logger = LoggerFactory.getLogger(ThreadTests.class);
 
     private static final Object lock = new Object();
     private static final Object lock2 = new Object();
@@ -25,7 +25,7 @@ public class ThreadTests {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            logger.info(">>>>> mm running ...");
+            log.info(">>>>> mm running ...");
         }
     };
 
@@ -37,7 +37,7 @@ public class ThreadTests {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                logger.info(">>>>> nn running ...");
+                log.info(">>>>> nn running ...");
                 lock.notify();
             }
         }
@@ -45,7 +45,7 @@ public class ThreadTests {
 
     private static Runnable qq = () -> {
         synchronized (lock2) {
-            logger.info(">>>>> qq running ...");
+            log.info(">>>>> qq running ...");
             lock2.notify();
         }
     };

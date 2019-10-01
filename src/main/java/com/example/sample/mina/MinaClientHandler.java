@@ -1,16 +1,16 @@
 package com.example.sample.mina;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 public class MinaClientHandler extends IoHandlerAdapter {
 
-    private static Logger logger = LoggerFactory.getLogger(MinaClientHandler.class);
+    // private static Logger logger = LoggerFactory.getLogger(MinaClientHandler.class);
 
     private static Map<String, IoSession> requestId2SessionMap = new ConcurrentHashMap<>();
     private static Map<IoSession, String> session2RequestIdMap = new ConcurrentHashMap<>();
@@ -29,7 +29,7 @@ public class MinaClientHandler extends IoHandlerAdapter {
 
     @Override
     public void messageReceived(IoSession session, Object message) {
-        logger.info(">>>>> RECEIVING MESSAGE: {}, SESSION_ID: {}", message, session.getId());
+        log.info(">>>>> RECEIVING MESSAGE: {}, SESSION_ID: {}", message, session.getId());
     }
 
     @Override

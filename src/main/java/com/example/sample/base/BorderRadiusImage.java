@@ -1,7 +1,6 @@
 package com.example.sample.base;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -10,15 +9,16 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+@Slf4j
 public class BorderRadiusImage {
 
-    private static Logger logger = LoggerFactory.getLogger(BorderRadiusImage.class);
+    // private static Logger logger = LoggerFactory.getLogger(BorderRadiusImage.class);
 
     public static void main(String[] args) throws IOException {
         makeCircularImg("C:\\Users\\Administrator\\Desktop\\multipart^form-data.png",
                 "C:\\Users\\Administrator\\Desktop\\multipart^form-data2.png",
                 775, 100);
-        logger.info(">>>>> DONE");
+        log.info(">>>>> DONE");
     }
 
     /***

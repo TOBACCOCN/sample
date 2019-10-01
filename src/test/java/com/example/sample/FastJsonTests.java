@@ -3,30 +3,30 @@ package com.example.sample;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+@Slf4j
 public class FastJsonTests {
 
-    private static Logger logger = LoggerFactory.getLogger(FastJsonTests.class);
+    // private static Logger logger = LoggerFactory.getLogger(FastJsonTests.class);
 
     @Test
     public void test() {
         JSONObject jsonObject = JSON.parseObject("{\"name\":\"zyh\"}");
-        logger.info(">>>>> jsonObject: {}", jsonObject);
+        log.info(">>>>> jsonObject: {}", jsonObject);
         JSONArray jsonArray = JSON.parseArray("[{\"name\":\"zyh\"}, {\"name\":\"zys\"}]");
-        logger.info(">>>>> jsonArray: {}", jsonArray);
+        log.info(">>>>> jsonArray: {}", jsonArray);
 
         Zhang zhang = JSON.parseObject("{\"name\":\"zyh\"}", Zhang.class);
-        logger.info(">>>>> zhang: {}", zhang);
+        log.info(">>>>> zhang: {}", zhang);
         List<Zhang> zhangs = JSON.parseArray("[{\"name\":\"zyh\"}, {\"name\":\"zys\"}]", Zhang.class);
-        logger.info(">>>>> zhangs: {}", zhangs);
+        log.info(">>>>> zhangs: {}", zhangs);
 
-        logger.info(">>>>> object-jsonString: {}", JSON.toJSONString(zhang));
-        logger.info(">>>>> list-jsonString: {}", JSON.toJSONString(zhangs));
+        log.info(">>>>> object-jsonString: {}", JSON.toJSONString(zhang));
+        log.info(">>>>> list-jsonString: {}", JSON.toJSONString(zhangs));
 
     }
 

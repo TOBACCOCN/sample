@@ -1,8 +1,7 @@
 package com.example.sample;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
@@ -10,9 +9,10 @@ import redis.clients.jedis.ScanResult;
 import java.util.List;
 import java.util.Map.Entry;
 
+@Slf4j
 public class RedisTests {
 
-    private static Logger logger = LoggerFactory.getLogger(RedisTests.class);
+    // private static Logger logger = LoggerFactory.getLogger(RedisTests.class);
 
     @Test
     public void test() {
@@ -25,10 +25,10 @@ public class RedisTests {
         params.count(2);
         // jedis.setex("name", 10, "zyh");
         ScanResult<Entry<String, String>> result = jedis.hscan("hash_test", "1", params);
-        logger.info(">>>>> CURSOR: [{}]", result.getStringCursor());
+        log.info(">>>>> CURSOR: [{}]", result.getStringCursor());
         List<Entry<String, String>> list = result.getResult();
         for (Entry<String, String> entry : list) {
-            logger.info(">>>>> {}: {}", entry.getKey(), entry.getValue());
+            log.info(">>>>> {}: {}", entry.getKey(), entry.getValue());
         }
 
         jedis.close();

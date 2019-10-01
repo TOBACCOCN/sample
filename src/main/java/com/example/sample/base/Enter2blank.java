@@ -1,17 +1,17 @@
 package com.example.sample.base;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 
+@Slf4j
 public class Enter2blank {
 
-    private static Logger logger = LoggerFactory.getLogger(Enter2blank.class);
+    // private static Logger logger = LoggerFactory.getLogger(Enter2blank.class);
 
     public static void main(String[] args) throws IOException {
         doEnter2blank("C:\\Users\\Administrator\\Desktop\\demo.txt", "C:\\Users\\Administrator\\Desktop\\zyh.txt");
-        logger.info(">>>>> DONE");
+        log.info(">>>>> DONE");
     }
 
     private static void doEnter2blank(String srcPath, String destPath) throws IOException {

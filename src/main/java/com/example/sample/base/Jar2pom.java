@@ -1,5 +1,6 @@
 package com.example.sample.base;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -10,8 +11,6 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,9 +25,10 @@ import java.util.jar.Manifest;
 /**
  * 通过Jar包SHA1或MD5生成Pom文件
  */
+@Slf4j
 public class Jar2pom {
 
-    private static Logger logger = LoggerFactory.getLogger(Jar2pom.class);
+    // private static Logger logger = LoggerFactory.getLogger(Jar2pom.class);
 
     /**
      * Maven 库
@@ -39,14 +39,14 @@ public class Jar2pom {
         //先通过Jar的SHA1查询 如果不存在则解析Manifest查询
         File libs = new File("D:\\git\\eliteai\\yunying\\target\\trans\\WEB-INF\\lib");
         for (File jar : Objects.requireNonNull(libs.listFiles())) {
-            logger.info("<!-- {} -->", jar.getName());
+            log.info("<!-- {} -->", jar.getName());
             if (!getPomByChecksum(jar).isTextOnly()) {
-                logger.info(getPomByChecksum(jar).asXML());
+                log.info(getPomByChecksum(jar).asXML());
             } else if (!getPomByManifest(jar).isTextOnly()) {
-                logger.info("<!--  Search by Manifest -->");
-                logger.info(getPomByManifest(jar).asXML());
+                log.info("<!--  Search by Manifest -->");
+                log.info(getPomByManifest(jar).asXML());
             } else {
-                logger.info("<!-- Found no data -->");
+                log.info("<!-- Found no data -->");
             }
         }
 

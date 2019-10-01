@@ -1,7 +1,6 @@
 package com.example.sample.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,9 +14,10 @@ import java.util.TimeZone;
  * @author zhangyonghong
  * @date 2018.3.29
  */
+@Slf4j
 public final class TimeUtil {
 
-    private static Logger logger = LoggerFactory.getLogger(TimeUtil.class);
+    // private static Logger logger = LoggerFactory.getLogger(TimeUtil.class);
 
     /**
      * yyyyMMdd'T'HHmmss'Z'格式时间转日期Date
@@ -67,7 +67,7 @@ public final class TimeUtil {
             calendar.add(Calendar.HOUR, zoneOffset);
             return prettyFormat.format(calendar.getTime());
         } catch (ParseException e) {
-            logger.info(e.getMessage());
+            log.info(e.getMessage());
             return "";
         }
     }

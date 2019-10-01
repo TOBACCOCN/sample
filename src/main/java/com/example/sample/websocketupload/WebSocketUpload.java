@@ -1,10 +1,10 @@
 package com.example.sample.websocketupload;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 
+@Slf4j
 public class WebSocketUpload {
 
     public static void main(String[] args) {
@@ -26,7 +26,7 @@ public class WebSocketUpload {
 
     static class UploadRunnable implements Runnable {
 
-        private Logger logger = LoggerFactory.getLogger(WebSocketUpload.class);
+        // private Logger logger = LoggerFactory.getLogger(WebSocketUpload.class);
 
         private String fileName;
         private String recogFileName;
@@ -69,7 +69,7 @@ public class WebSocketUpload {
         public void run() {
             WifiUploadClient uploadClient = new WifiUploadClient(fileName, recogFileName, userId, token);
             int startToSend = uploadClient.startToSend();
-            logger.info(">>>>> START TO SEND, CODE: [{}]", startToSend);
+            log.info(">>>>> START TO SEND, CODE: [{}]", startToSend);
         }
 
     }

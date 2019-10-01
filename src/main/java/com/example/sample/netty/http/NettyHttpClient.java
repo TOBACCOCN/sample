@@ -14,8 +14,7 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.util.AsciiString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.net.ssl.SSLException;
 import java.net.URI;
@@ -23,9 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class NettyHttpClient {
 
-    private static Logger logger = LoggerFactory.getLogger(NettyHttpClient.class);
+    // private static Logger logger = LoggerFactory.getLogger(NettyHttpClient.class);
 
     private static Bootstrap initBootStrap(Bootstrap bootstrap, EventLoopGroup workerGroup) {
         bootstrap = bootstrap.group(workerGroup).option(ChannelOption.SO_KEEPALIVE, true)
@@ -62,7 +62,7 @@ public class NettyHttpClient {
                 }
             });
             ChannelFuture future = bootstrap.connect(host, port).sync();
-            logger.info(">>>> NETTY HTTP CLIENT START TO CONNECT SERVER, HOST: {}, PORT: {}", host, port);
+            log.info(">>>> NETTY HTTP CLIENT START TO CONNECT SERVER, HOST: {}, PORT: {}", host, port);
             future.channel().closeFuture().sync();
         } finally {
             workerGroup.shutdownGracefully();
@@ -83,7 +83,7 @@ public class NettyHttpClient {
                 }
             });
             ChannelFuture future = bootstrap.connect(host, port).sync();
-            logger.info(">>>> NETTY HTTP CLIENT START TO CONNECT SERVER, HOST: {}, PORT: {}", host, port);
+            log.info(">>>> NETTY HTTP CLIENT START TO CONNECT SERVER, HOST: {}, PORT: {}", host, port);
             future.channel().closeFuture().sync();
         } finally {
             workerGroup.shutdownGracefully();
@@ -105,7 +105,7 @@ public class NettyHttpClient {
                 }
             });
             ChannelFuture future = bootstrap.connect(host, port).sync();
-            logger.info(">>>> NETTY HTTP CLIENT START TO CONNECT SERVER, HOST: {}, PORT: {}", host, port);
+            log.info(">>>> NETTY HTTP CLIENT START TO CONNECT SERVER, HOST: {}, PORT: {}", host, port);
             future.channel().closeFuture().sync();
         } finally {
             workerGroup.shutdownGracefully();

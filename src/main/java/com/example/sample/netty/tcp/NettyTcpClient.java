@@ -15,17 +15,17 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class NettyTcpClient implements Runnable {
 
-    private static Logger logger = LoggerFactory.getLogger(NettyTcpClient.class);
+    // private static Logger logger = LoggerFactory.getLogger(NettyTcpClient.class);
 
     private Channel channel;
     private static boolean channelInitialized = false;
@@ -46,7 +46,7 @@ public class NettyTcpClient implements Runnable {
                 try {
                     this.wait();
                 } catch (InterruptedException e) {
-                    ErrorPrintUtil.printErrorMsg(logger, e);
+                    ErrorPrintUtil.printErrorMsg(log, e);
                 }
             }
         }
@@ -72,7 +72,7 @@ public class NettyTcpClient implements Runnable {
                         }
                     });
             ChannelFuture future = bootstrap.connect(host, port).sync();
-            logger.info(">>>>> NETTY TCP CLIENT START TO CONNECT SERVER, HOST: {}, PORT: {}", host, port);
+            log.info(">>>>> NETTY TCP CLIENT START TO CONNECT SERVER, HOST: {}, PORT: {}", host, port);
             synchronized (this) {
                 channel = future.channel();
                 this.notify();
@@ -80,7 +80,7 @@ public class NettyTcpClient implements Runnable {
             channelInitialized = true;
             channel.closeFuture().sync();
         } catch (Exception e) {
-            ErrorPrintUtil.printErrorMsg(logger, e);
+            ErrorPrintUtil.printErrorMsg(log, e);
         } finally {
             workerGroup.shutdownGracefully();
         }
@@ -112,7 +112,7 @@ public class NettyTcpClient implements Runnable {
                         TimeUnit.MINUTES.sleep(5);
                         // TimeUnit.SECONDS.sleep(15);
                     } catch (InterruptedException e) {
-                        ErrorPrintUtil.printErrorMsg(logger, e);
+                        ErrorPrintUtil.printErrorMsg(log, e);
                     }
                 }
             }).start();

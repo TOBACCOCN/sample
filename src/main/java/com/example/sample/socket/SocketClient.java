@@ -1,22 +1,22 @@
 package com.example.sample.socket;
 
 import com.example.sample.util.ErrorPrintUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
+@Slf4j
 public class SocketClient {
 
-    private static Logger logger = LoggerFactory.getLogger(SocketClient.class);
+    // private static Logger logger = LoggerFactory.getLogger(SocketClient.class);
 
     private static Socket connectServer(String host, int port) {
         try {
             Socket socket = new Socket(host, port);
-            logger.info(">>>>> CONNECT SERVER SUCCESS, HOST: {}, PORT: {}", host, port);
+            log.info(">>>>> CONNECT SERVER SUCCESS, HOST: {}, PORT: {}", host, port);
 
             new Thread(() -> {
                 while (true) {
@@ -27,22 +27,22 @@ public class SocketClient {
                         BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                         String message = reader.readLine();
                         if (message != null) {
-                            logger.info(">>>>> RECEIVE MSG: {}", message);
+                            log.info(">>>>> RECEIVE MSG: {}", message);
                         }
                     } catch (Exception e) {
-                        ErrorPrintUtil.printErrorMsg(logger, e);
+                        ErrorPrintUtil.printErrorMsg(log, e);
                     }
                     try {
                         Thread.sleep(10);
                     } catch (InterruptedException e) {
-                        ErrorPrintUtil.printErrorMsg(logger, e);
+                        ErrorPrintUtil.printErrorMsg(log, e);
                     }
                 }
             }).start();
 
             return socket;
         } catch (Exception e) {
-            ErrorPrintUtil.printErrorMsg(logger, e);
+            ErrorPrintUtil.printErrorMsg(log, e);
             return null;
         }
     }

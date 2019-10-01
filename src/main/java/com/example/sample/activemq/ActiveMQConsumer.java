@@ -1,15 +1,15 @@
 package com.example.sample.activemq;
 
 import com.example.sample.util.ErrorPrintUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.jms.*;
 
+@Slf4j
 public class ActiveMQConsumer {
 
-    private static Logger logger = LoggerFactory.getLogger(ActiveMQConsumer.class);
+    // private static Logger logger = LoggerFactory.getLogger(ActiveMQConsumer.class);
 
 
     public static void main(String[] args) throws JMSException {
@@ -35,9 +35,9 @@ public class ActiveMQConsumer {
         consumer.setMessageListener(message -> {
             TextMessage textMessage = (TextMessage) message;
             try {
-                logger.info(">>>>> RECEIVING MESSAGE: {}", textMessage.getText());
+                log.info(">>>>> RECEIVING MESSAGE: {}", textMessage.getText());
             } catch (JMSException e) {
-                ErrorPrintUtil.printErrorMsg(logger, e);
+                ErrorPrintUtil.printErrorMsg(log, e);
             }
         });
     }

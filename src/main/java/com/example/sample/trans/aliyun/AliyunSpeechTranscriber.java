@@ -8,16 +8,16 @@ import com.alibaba.nls.client.protocol.asr.SpeechTranscriber;
 import com.alibaba.nls.client.protocol.asr.SpeechTranscriberListener;
 import com.alibaba.nls.client.protocol.asr.SpeechTranscriberResponse;
 import com.example.sample.util.ErrorPrintUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+@Slf4j
 public class AliyunSpeechTranscriber {
 
-    private static final Logger logger = LoggerFactory.getLogger(AliyunSpeechTranscriber.class);
+    // private static final log logger = LoggerFactory.getLogger(AliyunSpeechTranscriber.class);
 
     private String appKey;
     private NlsClient client;
@@ -31,8 +31,8 @@ public class AliyunSpeechTranscriber {
             accessToken.apply();
             String token = accessToken.getToken();
             long now = System.currentTimeMillis() / 1000;
-            logger.info(">>>>> TOKEN: [{}], EXPIRE_TIME: [{}]", token, accessToken.getExpireTime());
-            logger.info(">>>>> TOKEN VALID_DURATION: {}", accessToken.getExpireTime() - now);
+            log.info(">>>>> TOKEN: [{}], EXPIRE_TIME: [{}]", token, accessToken.getExpireTime());
+            log.info(">>>>> TOKEN VALID_DURATION: {}", accessToken.getExpireTime() - now);
             // 创建 NlsClient 实例,应用全局创建一个即可，用户指定服务地址
             if (url.isEmpty()) {
                 client = new NlsClient(id, secret);
@@ -40,7 +40,7 @@ public class AliyunSpeechTranscriber {
                 client = new NlsClient(url, token);
             }
         } catch (IOException e) {
-            ErrorPrintUtil.printErrorMsg(logger, e);
+            ErrorPrintUtil.printErrorMsg(log, e);
         }
     }
 
@@ -49,7 +49,7 @@ public class AliyunSpeechTranscriber {
             // 识别出中间结果。服务端识别出一个字或词时会返回此消息。仅当 setEnableIntermediateResult(true) 时，才会有此类消息返回
             @Override
             public void onTranscriptionResultChange(SpeechTranscriberResponse response) {
-                logger.info(">>>>> ON_RESULT_CHANGE, TASK_ID: {}, NAME: {}, STATUS: {}, INDEX: {}, RESULT: {}, TIME: {}",
+                log.info(">>>>> ON_RESULT_CHANGE, TASK_ID: {}, NAME: {}, STATUS: {}, INDEX: {}, RESULT: {}, TIME: {}",
                         response.getTaskId(),
                         response.getName(),
                         // 状态码 20000000 表示正常识别
@@ -67,19 +67,19 @@ public class AliyunSpeechTranscriber {
             @Override
             public void onTranscriberStart(SpeechTranscriberResponse response) {
                 // task_id 很重要，是调用方和服务端通信的唯一 ID 标识，当遇到问题时，需要提供此 task_id 以便排查
-                logger.info(">>>>> ON_START, task_id: " + response.getTaskId() + ", name: " + response.getName() + ", status: " + response.getStatus());
+                log.info(">>>>> ON_START, task_id: " + response.getTaskId() + ", name: " + response.getName() + ", status: " + response.getStatus());
             }
 
             // 识别语句开始
             @Override
             public void onSentenceBegin(SpeechTranscriberResponse response) {
-                logger.info(">>>>> ON_BEGIN, TASK_ID: {}, NAME: {}, STATUS: {}", response.getTaskId(), response.getName(), response.getStatus());
+                log.info(">>>>> ON_BEGIN, TASK_ID: {}, NAME: {}, STATUS: {}", response.getTaskId(), response.getName(), response.getStatus());
             }
 
             // 识别出一句话。服务端会智能断句，当识别到一句话结束时会返回此消息
             @Override
             public void onSentenceEnd(SpeechTranscriberResponse response) {
-                logger.info(">>>>> ON_END, TASK_ID: {}, NAME: {}, STATUS:{}, INDEX: {}, RESULT: {}, CONFIDENCE: {}, BEGIN_TIME: {}, TIME: {}",
+                log.info(">>>>> ON_END, TASK_ID: {}, NAME: {}, STATUS:{}, INDEX: {}, RESULT: {}, CONFIDENCE: {}, BEGIN_TIME: {}, TIME: {}",
                         response.getTaskId(),
                         response.getName(),
                         // 状态码 20000000 表示正常识别
@@ -100,14 +100,14 @@ public class AliyunSpeechTranscriber {
             // 服务完毕
             @Override
             public void onTranscriptionComplete(SpeechTranscriberResponse response) {
-                logger.info(">>>>> ON_COMPLETE, TASK_ID: {}, NAME: {}, STATUS: {}", response.getTaskId(), response.getName(), response.getStatus());
+                log.info(">>>>> ON_COMPLETE, TASK_ID: {}, NAME: {}, STATUS: {}", response.getTaskId(), response.getName(), response.getStatus());
             }
 
             // 识别失败
             @Override
             public void onFail(SpeechTranscriberResponse response) {
                 //  task_id 很重要，是调用方和服务端通信的唯一ID标识，当遇到问题时，需要提供此 task_id 以便排查
-                logger.info(">>>>> ON_FAIL, TASK_ID: {}, STATUS: {}, STATUS_TEXT: {}",
+                log.info(">>>>> ON_FAIL, TASK_ID: {}, STATUS: {}, STATUS_TEXT: {}",
                         response.getTaskId(), response.getStatus(), response.getStatusText());
             }
         };
@@ -148,7 +148,7 @@ public class AliyunSpeechTranscriber {
             // while ((len = fis.read(buf)) != -1) {
             while (fis.read(buf) != -1) {
                 // 以下日志输出用于调试
-                // logger.info("send data pack length: " + len);
+                // log.info("send data pack length: " + len);
                 transcriber.send(buf);
                 // 这里是用读取本地文件的形式模拟实时获取语音流并发送的，因为read很快，所以这里需要sleep
                 // 如果是真正的实时获取语音，则无需sleep, 如果是8k采样率语音，第二个参数改为8000
@@ -157,11 +157,11 @@ public class AliyunSpeechTranscriber {
             }
             // 通知服务端语音数据发送完毕,等待服务端处理完成
             long now = System.currentTimeMillis();
-            logger.info(">>>>> ASR WAIT FOR COMPLETE");
+            log.info(">>>>> ASR WAIT FOR COMPLETE");
             transcriber.stop();
-            logger.info("ASR LATENCY: {} MS", System.currentTimeMillis() - now);
+            log.info("ASR LATENCY: {} MS", System.currentTimeMillis() - now);
         } catch (Exception e) {
-            ErrorPrintUtil.printErrorMsg(logger, e);
+            ErrorPrintUtil.printErrorMsg(log, e);
         } finally {
             if (null != transcriber) {
                 transcriber.close();

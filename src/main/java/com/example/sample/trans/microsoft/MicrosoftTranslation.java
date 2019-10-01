@@ -1,9 +1,8 @@
 package com.example.sample.trans.microsoft;
 
 import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,9 +10,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class MicrosoftTranslation {
 
-    private static Logger logger = LoggerFactory.getLogger(MicrosoftTranslation.class);
+    // private static Logger logger = LoggerFactory.getLogger(MicrosoftTranslation.class);
 
     public static void main(String[] args) throws IOException {
         // 全局
@@ -30,7 +30,7 @@ public class MicrosoftTranslation {
         String to = "zh-Hans";
         String text = "Welcome to Microsoft Translator. Guess how many languages I speak!";
         ResponseBody response = post(url, subscriptionKey, from, to, text);
-        logger.info(">>>> RESULT: {}", response == null ? null : response.string());
+        log.info(">>>> RESULT: {}", response == null ? null : response.string());
     }
 
     private static ResponseBody post(String url, String subscriptionKey, String from, String to, String text) throws IOException {

@@ -2,15 +2,15 @@ package com.example.sample.netty.websocket;
 
 import com.example.sample.util.ErrorPrintUtil;
 import io.netty.channel.Channel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 public class WebsocketChannelManager {
 
-    private static Logger logger = LoggerFactory.getLogger(WebsocketChannelManager.class);
+    // private static Logger logger = LoggerFactory.getLogger(WebsocketChannelManager.class);
 
     private static Map<String, Channel> requestId2ChannelMap = new ConcurrentHashMap<>();
     private static Map<Channel, String> channel2RequestIdMap = new ConcurrentHashMap<>();
@@ -49,7 +49,7 @@ public class WebsocketChannelManager {
             try {
                 channel.wait();
             } catch (InterruptedException e) {
-                ErrorPrintUtil.printErrorMsg(logger, e);
+                ErrorPrintUtil.printErrorMsg(log, e);
             }
         }
         return requestId2IsConnectSuccessMap.remove(requestId);

@@ -8,16 +8,16 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.websocketx.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Object> {
 
-    private static Logger logger = LoggerFactory.getLogger(NettyWebSocketServerHandler.class);
+    // private static Logger logger = LoggerFactory.getLogger(NettyWebSocketServerHandler.class);
 
     private WebSocketServerHandshaker handshaker;
 
@@ -58,7 +58,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Obj
         String upgrade = request.headers().get(UPGRADE);
         // 非 websocket 的 http 握手请求处理
         if (!request.decoderResult().isSuccess() || !WEBSOCKET.equals(upgrade)) {
-            logger.info(">>>>>  NOT HANDSHAKER OF WEBSOCKET");
+            log.info(">>>>>  NOT HANDSHAKER OF WEBSOCKET");
             ctx.writeAndFlush(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
                     HttpResponseStatus.BAD_REQUEST));
             return;
@@ -72,7 +72,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Obj
         handshaker = wsFactory.newHandshaker(request);
         if (handshaker == null) {
             // 不支持的请求
-            logger.info(">>>>> REQUEST NOT SUPPORTED");
+            log.info(">>>>> REQUEST NOT SUPPORTED");
             WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(channel);
         } else {
             // handshaker.handshake(channel, request);
@@ -112,16 +112,16 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Obj
             channel.close();
         } else {
             if (frame instanceof CloseWebSocketFrame) {
-                logger.info(">>>>> CLOSE WEBSOCKET FROM CLIENT");
+                log.info(">>>>> CLOSE WEBSOCKET FROM CLIENT");
                 channel.close();
             } else if (frame instanceof PingWebSocketFrame) {
-                logger.info(">>>>> PING FROM CLIENT");
+                log.info(">>>>> PING FROM CLIENT");
                 ctx.writeAndFlush(new PongWebSocketFrame(frame.content().retain()));
             } else if (frame instanceof TextWebSocketFrame) {
                 String text = ((TextWebSocketFrame) frame).text();
-                logger.info(">>>>> TEXT_MESSAGE: {}", text);
+                log.info(">>>>> TEXT_MESSAGE: {}", text);
             } else if (frame instanceof BinaryWebSocketFrame) {
-                logger.info(">>>>> BINARY_MESSAGE_LENGTH: {}", frame.content().readableBytes());
+                log.info(">>>>> BINARY_MESSAGE_LENGTH: {}", frame.content().readableBytes());
                 // TODO
             }
         }
@@ -129,7 +129,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Obj
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        logger.info(">>>>> CLIENT CONNECTED, CHANNELID:{}, ADDRESS: {}",
+        log.info(">>>>> CLIENT CONNECTED, CHANNELID:{}, ADDRESS: {}",
                 ctx.channel().id(), ctx.channel().remoteAddress());
     }
 
@@ -142,9 +142,9 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Obj
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         if (cause instanceof IOException) {
-            logger.info(">>>>> CLIENT CLOSED");
+            log.info(">>>>> CLIENT CLOSED");
         } else {
-            ErrorPrintUtil.printErrorMsg(logger, cause);
+            ErrorPrintUtil.printErrorMsg(log, cause);
         }
 
         Channel channel = ctx.channel();

@@ -3,12 +3,11 @@ package com.example.sample.trans.ifly;
 import com.example.sample.util.ErrorPrintUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -32,9 +31,10 @@ import java.util.*;
  * 添加后会显示该方言/语种的参数值
  */
 
+@Slf4j
 public class IflyStreamRecognition {
 
-    private static Logger logger = LoggerFactory.getLogger(IflyWebsocketListener.class);
+    // private static Logger logger = LoggerFactory.getLogger(IflyWebsocketListener.class);
 
     //中英文
     private static final String url = "https://iat-api.xfyun.cn/v2/iat";
@@ -57,7 +57,7 @@ public class IflyStreamRecognition {
         // OkHttpClient client = new OkHttpClient.Builder().build();
         // //将url中的 schema http:// 和 https:// 分别替换为 ws:// 和 wss://
         // String url = authUrl.replace("https://", "wss://");
-        // logger.info(">>>>> URL: {}", url);
+        // log.info(">>>>> URL: {}", url);
         //
         // Request request = new Request.Builder().url(url).build();
         // client.newWebSocket(request, new IflyWebsocketListener());
@@ -85,7 +85,7 @@ public class IflyStreamRecognition {
 
         String authorization = String.format("api_key=\"%s\", algorithm=\"%s\", headers=\"%s\", signature=\"%s\"",
                 apiKey, "hmac-sha256", "host date request-line", sha);
-        logger.info(">>>>> AUTHORIZATION: {}", authorization);
+        log.info(">>>>> AUTHORIZATION: {}", authorization);
 
         HttpUrl httpUrl = Objects.requireNonNull(HttpUrl.parse(url)).newBuilder().
                 addQueryParameter("authorization", Base64.getEncoder().encodeToString(authorization.getBytes(charset))).
@@ -102,7 +102,7 @@ public class IflyStreamRecognition {
             super.onOpen(webSocket, response);
             //连接成功，开始发送数据
             Thread thread = Thread.currentThread();
-            logger.info(">>>>> CURRENT_THREAD: {}", thread);
+            log.info(">>>>> CURRENT_THREAD: {}", thread);
             startSendDataAThread(webSocket);
 
         }
@@ -196,9 +196,9 @@ public class IflyStreamRecognition {
                         //模拟音频采样延时
                         // Thread.sleep(interval);
                     }
-                    logger.info(">>>>> ALL DATA SENDED");
+                    log.info(">>>>> ALL DATA SENDED");
                 } catch (Exception e) {
-                    ErrorPrintUtil.printErrorMsg(logger, e);
+                    ErrorPrintUtil.printErrorMsg(log, e);
                 }
             }).start();
         }
@@ -207,13 +207,13 @@ public class IflyStreamRecognition {
         @Override
         public void onMessage(WebSocket webSocket, String text) {
             super.onMessage(webSocket, text);
-            logger.info(">>>>> ON_MESSAGE: {}", text);
+            log.info(">>>>> ON_MESSAGE: {}", text);
             Thread thread = Thread.currentThread();
-            logger.info(">>>>> CURRENT_THREAD: {}", thread);
+            log.info(">>>>> CURRENT_THREAD: {}", thread);
             ResponseData response = json.fromJson(text, ResponseData.class);
             if (response != null) {
                 if (response.getCode() != 0) {
-                    logger.info(">>>>> 错误码查询链接：https://www.xfyun.cn/document/error-code");
+                    log.info(">>>>> 错误码查询链接：https://www.xfyun.cn/document/error-code");
                     return;
                 }
                 if (response.getData() != null) {
@@ -221,14 +221,14 @@ public class IflyStreamRecognition {
                         Text result = response.getData().getResult().getText();
                         try {
                             decoder.decode(result);
-                            logger.info(">>>>> RESULT: {}", decoder.toString());
+                            log.info(">>>>> RESULT: {}", decoder.toString());
                         } catch (Exception e) {
-                            ErrorPrintUtil.printErrorMsg(logger, e);
+                            ErrorPrintUtil.printErrorMsg(log, e);
                         }
                     }
                     if (response.getData().getStatus() == 2) {
-                        logger.info(">>>>> COST: [{}] MS", System.currentTimeMillis() - begin);
-                        logger.info(">>>>> FINAL_RESULT: {}", decoder.toString());
+                        log.info(">>>>> COST: [{}] MS", System.currentTimeMillis() - begin);
+                        log.info(">>>>> FINAL_RESULT: {}", decoder.toString());
                         decoder.discard();
                         // webSocket.close(0, "");
                     }
@@ -239,7 +239,7 @@ public class IflyStreamRecognition {
         @Override
         public void onFailure(WebSocket webSocket, Throwable throwable, Response response) {
             super.onFailure(webSocket, throwable, response);
-            logger.info(">>>>> ON_FAILURE");
+            log.info(">>>>> ON_FAILURE");
             // startSendDataAThread(webSocket);
         }
 

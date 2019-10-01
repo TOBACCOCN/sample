@@ -1,8 +1,7 @@
 package com.example.sample;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPoolConfig;
@@ -11,9 +10,10 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+@Slf4j
 public class RedisClusterTests {
 
-    private static Logger logger = LoggerFactory.getLogger(RedisClusterTests.class);
+    // private static Logger logger = LoggerFactory.getLogger(RedisClusterTests.class);
 
     @Test
     public void test() throws IOException {
@@ -37,6 +37,6 @@ public class RedisClusterTests {
         jcd.set("name", "zhangsan");
         String value = jcd.get("name");
         jcd.close();
-        logger.info(">>>>> name: [{}]", value);
+        log.info(">>>>> name: [{}]", value);
     }
 }

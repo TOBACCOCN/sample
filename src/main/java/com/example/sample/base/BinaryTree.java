@@ -1,16 +1,16 @@
 package com.example.sample.base;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+@Slf4j
 public class BinaryTree {
 
-    private static Logger logger = LoggerFactory.getLogger(BinaryTree.class);
+    // private static Logger logger = LoggerFactory.getLogger(BinaryTree.class);
 
     @SuppressWarnings("unused")
     public static void main(String[] args) {
@@ -27,16 +27,16 @@ public class BinaryTree {
         binaryTree.sortArray();
         long end = System.currentTimeMillis();
         for (Integer integer : binaryTree.sortedList) {
-            logger.info("" + integer);
+            log.info("" + integer);
         }
         long cost = end - begin;
-        logger.info(">>>>> BinaryTree.sort(), cost: [{}] ms", cost);
+        log.info(">>>>> BinaryTree.sort(), cost: [{}] ms", cost);
 
         begin = System.currentTimeMillis();
         Arrays.sort(list.toArray());
         end = System.currentTimeMillis();
         cost = end - begin;
-        logger.info(">>>>> Arrays.sort(), cost: [{}] ms", cost);
+        log.info(">>>>> Arrays.sort(), cost: [{}] ms", cost);
     }
 
     private List<Integer> sortedList = new ArrayList<>();

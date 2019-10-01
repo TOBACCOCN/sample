@@ -4,14 +4,14 @@ import com.alibaba.fastjson.JSON;
 import com.example.sample.util.ErrorPrintUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
+@Slf4j
 public class NettyTcpClientHandler extends SimpleChannelInboundHandler<String> {
 
-    private static Logger logger = LoggerFactory.getLogger(NettyTcpClientHandler.class);
+    // private static Logger logger = LoggerFactory.getLogger(NettyTcpClientHandler.class);
 
     private static final String MESSAGE = "message";
     private static final String MESSAGE_CONNECT_SUCCESS = "connect success";
@@ -25,14 +25,14 @@ public class NettyTcpClientHandler extends SimpleChannelInboundHandler<String> {
     @Override
     @SuppressWarnings("unchecked")
     protected void channelRead0(ChannelHandlerContext ctx, String msg) {
-        logger.info(">>>> RECEIVING MESSAGE: {}", msg);
+        log.info(">>>> RECEIVING MESSAGE: {}", msg);
         try {
             Map<String, String> map = JSON.parseObject(msg, Map.class);
             if (MESSAGE_CONNECT_SUCCESS.equals(map.get(MESSAGE))) {
                 TcpChannelManager.connectSuccess(headerMap.get("requestId"), ctx.channel());
             }
         } catch (Exception e) {
-            logger.info(">>>>> MESSAGE IS NOT JSON");
+            log.info(">>>>> MESSAGE IS NOT JSON");
         }
     }
 
@@ -48,7 +48,7 @@ public class NettyTcpClientHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        ErrorPrintUtil.printErrorMsg(logger, cause);
+        ErrorPrintUtil.printErrorMsg(log, cause);
         ctx.close();
     }
 

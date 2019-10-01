@@ -7,15 +7,15 @@ import com.example.sample.util.SignUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.Map;
 
+@Slf4j
 public class NettyTcpServerHandler extends SimpleChannelInboundHandler<String> {
 
-    private static Logger logger = LoggerFactory.getLogger(NettyTcpServerHandler.class);
+    // private static Logger logger = LoggerFactory.getLogger(NettyTcpServerHandler.class);
 
     private static final String REQUEST_ID = "requestId";
     private static final String SIGN = "sign";
@@ -23,7 +23,7 @@ public class NettyTcpServerHandler extends SimpleChannelInboundHandler<String> {
     @Override
     @SuppressWarnings("unchecked")
     public void channelRead0(ChannelHandlerContext ctx, String msg) {
-        logger.info(">>>>> RECEIVING MESSAGE: {}", msg);
+        log.info(">>>>> RECEIVING MESSAGE: {}", msg);
         Channel channel = ctx.channel();
         if (TcpChannelManager.getRequestId(channel) == null) {
             try {
@@ -34,21 +34,21 @@ public class NettyTcpServerHandler extends SimpleChannelInboundHandler<String> {
                     json.put("message", "connect success");
                     channel.writeAndFlush(json.toString());
                 } else {
-                    logger.info(">>>>> INVALID SIGN");
+                    log.info(">>>>> INVALID SIGN");
                     JSONObject json = new JSONObject();
                     json.put("message", "invalid sign");
                     channel.writeAndFlush(json.toString());
                     channel.close();
                 }
             } catch (Exception e) {
-                ErrorPrintUtil.printErrorMsg(logger, e);
+                ErrorPrintUtil.printErrorMsg(log, e);
             }
         }
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        logger.info(">>>>> CLIENT CONNECTED, CHANNELID:{}, ADDRESS: {}",
+        log.info(">>>>> CLIENT CONNECTED, CHANNELID:{}, ADDRESS: {}",
                 ctx.channel().id(), ctx.channel().remoteAddress());
     }
 
@@ -61,9 +61,9 @@ public class NettyTcpServerHandler extends SimpleChannelInboundHandler<String> {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         if (cause instanceof IOException) {
-            logger.info(">>>>> CLIENT CLOSED");
+            log.info(">>>>> CLIENT CLOSED");
         } else {
-            ErrorPrintUtil.printErrorMsg(logger, cause);
+            ErrorPrintUtil.printErrorMsg(log, cause);
         }
 
         Channel channel = ctx.channel();

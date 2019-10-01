@@ -1,8 +1,7 @@
 package com.example.sample.base;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -12,15 +11,16 @@ import java.util.*;
  * @author zhangyonghong
  * @date 2018.8.30
  */
+@Slf4j
 public class LeetCode {
 
-    private static Logger logger = LoggerFactory.getLogger(LeetCode.class);
+    // private static Logger logger = LoggerFactory.getLogger(LeetCode.class);
 
     private static int assignCookies(int[] children, int[] cookies) {
         Arrays.sort(children);
-        logger.info(">>>>> SORTED CHILDREN: {}", children);
+        log.info(">>>>> SORTED CHILDREN: {}", children);
         Arrays.sort(cookies);
-        logger.info(">>>>> SORTED COOKIES: {}", cookies);
+        log.info(">>>>> SORTED COOKIES: {}", cookies);
         int result = 0;
         int i = 0, j = 0;
         while (i < children.length && j < cookies.length) {
@@ -96,9 +96,9 @@ public class LeetCode {
         list.toArray(array);
 
         List<int[]> indexPairs = twoSum(array, target);
-        logger.info(">>>>> ------VALUE------");
+        log.info(">>>>> ------VALUE------");
         for (int[] indexArray : indexPairs) {
-            logger.info(">>>>> [{}, {}]", array[indexArray[0]], array[indexArray[1]]);
+            log.info(">>>>> [{}, {}]", array[indexArray[0]], array[indexArray[1]]);
         }
         return indexPairs;
     }
@@ -153,7 +153,7 @@ public class LeetCode {
         }
 
         long end = System.currentTimeMillis();
-        logger.info(">>>>> COST_TIME: [{}] ms", end - start);
+        log.info(">>>>> COST_TIME: [{}] ms", end - start);
         return returnList;
     }
 
@@ -163,14 +163,14 @@ public class LeetCode {
         int target = 324234;
         int max = 1000000;
         List<int[]> list = LeetCode.doTwoSum(count, target, max);
-        logger.info(">>>>> ------INDEX------");
-        list.forEach(array -> logger.info(">>>>> [{}, {}]", array[0], array[1]));
+        log.info(">>>>> ------INDEX------");
+        list.forEach(array -> log.info(">>>>> [{}, {}]", array[0], array[1]));
     }
 
     @Test
     public void sqrt() {
         int n = LeetCode.sqrt(1058);
-        logger.info(">>>>> n: {}", n);
+        log.info(">>>>> n: {}", n);
     }
 
     @Test
@@ -180,10 +180,10 @@ public class LeetCode {
         combination(result, "", 15, 0);
         long end = System.currentTimeMillis();
         // for (String string : list) {
-        //     logger.info(">>>>> {}", string);
+        //     log.info(">>>>> {}", string);
         // }
-        logger.info(">>>>> SIZE: [{}]", result.size());
-        logger.info(">>>>> COST: [{}] ms", end - begin);
+        log.info(">>>>> SIZE: [{}]", result.size());
+        log.info(">>>>> COST: [{}] ms", end - begin);
     }
 
     @Test
@@ -193,15 +193,15 @@ public class LeetCode {
         Random random = new Random((int) (Math.random() * max) + 1);
 
         int[] children = generateArray(random, max);
-        logger.info(">>>>> CHILDREN: {}", children);
+        log.info(">>>>> CHILDREN: {}", children);
 
         int[] cookies = generateArray(random, max);
-        logger.info(">>>>> COOKIES: {}", cookies);
+        log.info(">>>>> COOKIES: {}", cookies);
 
         long start = System.currentTimeMillis();
         int result = assignCookies(children, cookies);
-        logger.info(">>>>> COST: {} ms", System.currentTimeMillis() - start);
-        logger.info(">>>>> RESULT: {}", result);
+        log.info(">>>>> COST: {} ms", System.currentTimeMillis() - start);
+        log.info(">>>>> RESULT: {}", result);
     }
 
     private int[] generateArray(Random random, int max) {

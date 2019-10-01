@@ -1,12 +1,12 @@
 package com.example.sample.base;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+@Slf4j
 public class Recursion {
 
-    private static Logger logger = LoggerFactory.getLogger(Recursion.class);
+    // private static Logger logger = LoggerFactory.getLogger(Recursion.class);
 
     /**
      * @param n           盘子的个数
@@ -31,7 +31,7 @@ public class Recursion {
         char assist = 'b';
         char destination = 'c';
         long hanoi = hanoi(n, origin, assist, destination);
-        logger.info(">>>>> HANOI: {}", hanoi);
+        log.info(">>>>> HANOI: {}", hanoi);
     }
 
 }

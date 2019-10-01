@@ -2,21 +2,21 @@ package com.example.sample.base;
 
 import com.alibaba.fastjson.JSONObject;
 import com.example.sample.util.HttpURLConnectionUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 public class CrawlingCommentsAboutDivorceOfMayiliAndWenzhang {
 
-    private static Logger logger = LoggerFactory.getLogger(CrawlingCommentsAboutDivorceOfMayiliAndWenzhang.class);
+    // private static Logger logger = LoggerFactory.getLogger(CrawlingCommentsAboutDivorceOfMayiliAndWenzhang.class);
 
     public static void main(String[] args) throws Exception {
         // 根据一次请求数据，总页数 2600 多一点，后续应该会不断增加
@@ -30,12 +30,12 @@ public class CrawlingCommentsAboutDivorceOfMayiliAndWenzhang {
         String filePath = "D:/mayili.csv";
         BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
         for (int i = 1; i <= pages; i++) {
-            logger.info(">>>>> PAGE: {}", i);
+            log.info(">>>>> PAGE: {}", i);
             String url = "https://weibo.com/aj/v6/comment/big?ajwvr=6&id=4399042567665659&page=" + i;
             String result = HttpURLConnectionUtil.httpGet(url, headerMap);
             JSONObject jsonObject = JSONObject.parseObject(result);
             String html = jsonObject.getJSONObject("data").getString("html");
-            logger.info(">>>>> HTML: {}", html);
+            log.info(">>>>> HTML: {}", html);
             Document document = Jsoup.parse(html);
             Elements elements = document.select("div.WB_text");
             for (Element element : elements) {
@@ -43,7 +43,7 @@ public class CrawlingCommentsAboutDivorceOfMayiliAndWenzhang {
                 String[] array = text.split("：");
                 if (array.length > 1) {
                     String comment = array[1];
-                    logger.info(">>>>> COMMENT: {}", comment);
+                    log.info(">>>>> COMMENT: {}", comment);
                     writer.write(comment);
                     writer.newLine();
                     writer.flush();

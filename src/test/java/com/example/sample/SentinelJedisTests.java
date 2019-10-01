@@ -1,17 +1,17 @@
 package com.example.sample;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisSentinelPool;
 
 import java.util.HashSet;
 import java.util.Set;
 
+@Slf4j
 public class SentinelJedisTests {
 
-    private static Logger logger = LoggerFactory.getLogger(SentinelJedisTests.class);
+    // private static Logger logger = LoggerFactory.getLogger(SentinelJedisTests.class);
 
     @Test
     public void test() {
@@ -24,7 +24,7 @@ public class SentinelJedisTests {
         JedisSentinelPool redisSentinelJedisPool = new JedisSentinelPool(clusterName, sentinels, "foobared");
         try (Jedis jedis = redisSentinelJedisPool.getResource()) {
             //jedis.set("key", "aaa");
-            logger.info(">>>>> NAME: [{}]", jedis.get("name"));
+            log.info(">>>>> NAME: [{}]", jedis.get("name"));
         } catch (Exception e) {
             e.printStackTrace();
         }

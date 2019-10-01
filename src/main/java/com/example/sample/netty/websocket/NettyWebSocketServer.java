@@ -16,15 +16,15 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class NettyWebSocketServer implements Runnable {
 
-    private static Logger logger = LoggerFactory.getLogger(NettyWebSocketServer.class);
+    // private static Logger logger = LoggerFactory.getLogger(NettyWebSocketServer.class);
 
     private String protocol;
 
@@ -69,10 +69,10 @@ public class NettyWebSocketServer implements Runnable {
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
             ChannelFuture future = serverBootstrap.bind(port).sync();
-            logger.info(">>>>> NETTY WEBSOCKET SERVER STARTING, PORT: {}", port);
+            log.info(">>>>> NETTY WEBSOCKET SERVER STARTING, PORT: {}", port);
             future.channel().closeFuture().sync();
         } catch (InterruptedException e) {
-            ErrorPrintUtil.printErrorMsg(logger, e);
+            ErrorPrintUtil.printErrorMsg(log, e);
         } finally {
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
@@ -101,7 +101,7 @@ public class NettyWebSocketServer implements Runnable {
                     // TimeUnit.SECONDS.sleep(15);
                 }
             } catch (InterruptedException e) {
-                ErrorPrintUtil.printErrorMsg(logger, e);
+                ErrorPrintUtil.printErrorMsg(log, e);
             }
         }).start();
     }

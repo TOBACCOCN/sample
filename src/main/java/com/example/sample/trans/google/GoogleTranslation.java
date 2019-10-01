@@ -3,12 +3,12 @@ package com.example.sample.trans.google;
 import com.google.cloud.translate.Translate;
 import com.google.cloud.translate.TranslateOptions;
 import com.google.cloud.translate.Translation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class GoogleTranslation {
 
-    private static Logger logger = LoggerFactory.getLogger(GoogleTranslation.class);
+    // private static Logger logger = LoggerFactory.getLogger(GoogleTranslation.class);
 
     public static void main(String[] args) {
         // Instantiates a client
@@ -21,7 +21,7 @@ public class GoogleTranslation {
         Translation translation =
                 translate.translate(text, Translate.TranslateOption.sourceLanguage("en"),
                         Translate.TranslateOption.targetLanguage("ru"));
-        logger.info(">>>>> TRANSLATION: {}", translation.getTranslatedText());
+        log.info(">>>>> TRANSLATION: {}", translation.getTranslatedText());
     }
 
 }

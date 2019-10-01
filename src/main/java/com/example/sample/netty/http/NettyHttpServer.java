@@ -14,12 +14,12 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class NettyHttpServer {
 
-    private static Logger logger = LoggerFactory.getLogger(NettyHttpServer.class);
+    // private static Logger logger = LoggerFactory.getLogger(NettyHttpServer.class);
 
     private int port;
 
@@ -69,7 +69,7 @@ public class NettyHttpServer {
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
             ChannelFuture future = bootstrap.bind(port).sync();
-            logger.info(">>>>> NETTY HTTP SERVER STARTED, PORT: {}", port);
+            log.info(">>>>> NETTY HTTP SERVER STARTED, PORT: {}", port);
             future.channel().closeFuture().sync();
         } finally {
             workerGroup.shutdownGracefully();

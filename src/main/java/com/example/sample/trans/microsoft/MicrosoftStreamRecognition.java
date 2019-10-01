@@ -7,8 +7,7 @@ import com.microsoft.cognitiveservices.speech.audio.AudioInputStream;
 import com.microsoft.cognitiveservices.speech.audio.PushAudioInputStream;
 import com.microsoft.cognitiveservices.speech.translation.SpeechTranslationConfig;
 import com.microsoft.cognitiveservices.speech.translation.TranslationRecognizer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
@@ -17,9 +16,10 @@ import java.util.Map;
 import java.util.concurrent.Semaphore;
 
 // https://github.com/Azure-Samples/cognitive-services-speech-sdk/tree/master/samples/java/jre/console
+@Slf4j
 public class MicrosoftStreamRecognition {
 
-    private static Logger logger = LoggerFactory.getLogger(MicrosoftStreamRecognition.class);
+    // private static Logger logger = LoggerFactory.getLogger(MicrosoftStreamRecognition.class);
 
     public static void main(String[] args) throws Exception {
         String language = "zh-CN";
@@ -67,7 +67,7 @@ public class MicrosoftStreamRecognition {
             // 异步获取识别结果
             recognizer.startContinuousRecognitionAsync().get();
         } catch (Exception e) {
-            ErrorPrintUtil.printErrorMsg(logger, e);
+            ErrorPrintUtil.printErrorMsg(log, e);
         }
         return pushStream;
     }
@@ -115,24 +115,24 @@ public class MicrosoftStreamRecognition {
             // 识别中
             // 以下日志输出用于调试
             speechRecognizer.recognizing.addEventListener((s, e) ->
-                    logger.info(">>>>> RECOGNIZING: {}", e.getResult().getText())
+                    log.info(">>>>> RECOGNIZING: {}", e.getResult().getText())
             );
 
             // 识别完成
             speechRecognizer.recognized.addEventListener((s, e) -> {
                 if (e.getResult().getReason() == ResultReason.RecognizedSpeech) {
-                    logger.info(">>>>> RECOGNIZED: {}", e.getResult().getText());
+                    log.info(">>>>> RECOGNIZED: {}", e.getResult().getText());
                 } else if (e.getResult().getReason() == ResultReason.NoMatch) {
-                    logger.info(">>>>> NOMATCH: Speech could not be recognized.");
+                    log.info(">>>>> NOMATCH: Speech could not be recognized.");
                 }
             });
 
             // 取消识别
             speechRecognizer.canceled.addEventListener((s, e) -> {
-                logger.info(">>>>> CANCELED, REASON: [{}]", e.getReason());
+                log.info(">>>>> CANCELED, REASON: [{}]", e.getReason());
 
                 if (e.getReason() == CancellationReason.Error) {
-                    logger.info(">>>>> CANCELED: ERROR_CODE: [{}], ERROR_DETAILS: [{}]",
+                    log.info(">>>>> CANCELED: ERROR_CODE: [{}], ERROR_DETAILS: [{}]",
                             e.getErrorCode(), e.getErrorDetails());
                 }
             });
@@ -143,36 +143,36 @@ public class MicrosoftStreamRecognition {
             // 识别翻译中
             // 以下日志输出用于调试
             translationRecognizer.recognizing.addEventListener((s, e) -> {
-                logger.info(">>>>> RECOGNIZING: [{}]", e.getResult().getText());
+                log.info(">>>>> RECOGNIZING: [{}]", e.getResult().getText());
 
                 Map<String, String> map = e.getResult().getTranslations();
                 for (String element : map.keySet()) {
-                    logger.info(">>>>> TRANSLATING INTO [{}]: [{}]", element, map.get(element));
+                    log.info(">>>>> TRANSLATING INTO [{}]: [{}]", element, map.get(element));
                 }
             });
 
             // 识别翻译完成
             translationRecognizer.recognized.addEventListener((s, e) -> {
                 if (e.getResult().getReason() == ResultReason.TranslatedSpeech) {
-                    logger.info(">>>>> RECOGNIZED: [{}]", e.getResult().getText());
+                    log.info(">>>>> RECOGNIZED: [{}]", e.getResult().getText());
 
                     Map<String, String> map = e.getResult().getTranslations();
                     for (String element : map.keySet()) {
-                        logger.info(">>>>> TRANSLATED INTO [{}]: [{}]", element, map.get(element));
+                        log.info(">>>>> TRANSLATED INTO [{}]: [{}]", element, map.get(element));
                     }
                 }
                 if (e.getResult().getReason() == ResultReason.RecognizedSpeech) {
-                    logger.info(">>>>> RECOGNIZED: [{}]", e.getResult().getText());
+                    log.info(">>>>> RECOGNIZED: [{}]", e.getResult().getText());
                 } else if (e.getResult().getReason() == ResultReason.NoMatch) {
-                    logger.info(">>>>> NOMATCH: SPEECH COULD NOT BE RECOGNIZED.");
+                    log.info(">>>>> NOMATCH: SPEECH COULD NOT BE RECOGNIZED.");
                 }
             });
 
             translationRecognizer.canceled.addEventListener((s, e) -> {
-                logger.info(">>>>> CANCELED: [{}]", e.getReason());
+                log.info(">>>>> CANCELED: [{}]", e.getReason());
 
                 if (e.getReason() == CancellationReason.Error) {
-                    logger.info(">>>>> CANCELED: ERROR_CODE: [{}], ERROR_DETAILS: [{}]",
+                    log.info(">>>>> CANCELED: ERROR_CODE: [{}], ERROR_DETAILS: [{}]",
                             e.getErrorCode(), e.getErrorDetails());
                 }
 
@@ -182,12 +182,12 @@ public class MicrosoftStreamRecognition {
 
         // 会话开始
         recognizer.sessionStarted.addEventListener((s, e) -> {
-            logger.info(">>>>> SESSION STARTED");
+            log.info(">>>>> SESSION STARTED");
         });
 
         // 会话结束
         recognizer.sessionStopped.addEventListener((s, e) -> {
-            logger.info(">>>>> SESSION STOPPED");
+            log.info(">>>>> SESSION STOPPED");
             if (semaphore != null) {
                 semaphore.release();
             }

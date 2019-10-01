@@ -2,23 +2,23 @@ package com.example.sample.mina;
 
 import com.alibaba.fastjson.JSONObject;
 import com.example.sample.util.ErrorPrintUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class MinaServer {
 
-    private static Logger logger = LoggerFactory.getLogger(MinaServer.class);
+    // private static Logger logger = LoggerFactory.getLogger(MinaServer.class);
 
     public static void startServer(int port) {
         IoAcceptor ioAcceptor = new NioSocketAcceptor();
@@ -29,9 +29,9 @@ public class MinaServer {
         ioAcceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
         try {
             ioAcceptor.bind(new InetSocketAddress(port));
-            logger.info(">>>>> MINA SERVER STARTED, PORT: {}", port);
+            log.info(">>>>> MINA SERVER STARTED, PORT: {}", port);
         } catch (IOException e) {
-            ErrorPrintUtil.printErrorMsg(logger, e);
+            ErrorPrintUtil.printErrorMsg(log, e);
             ioAcceptor.dispose();
         }
 
@@ -56,7 +56,7 @@ public class MinaServer {
                     // TimeUnit.MINUTES.sleep(5);
                     TimeUnit.SECONDS.sleep(5);
                 } catch (InterruptedException e) {
-                    ErrorPrintUtil.printErrorMsg(logger, e);
+                    ErrorPrintUtil.printErrorMsg(log, e);
                 }
             }
         }).start();

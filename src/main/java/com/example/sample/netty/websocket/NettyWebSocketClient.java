@@ -21,8 +21,7 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -30,9 +29,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class NettyWebSocketClient implements Runnable {
 
-    private static Logger logger = LoggerFactory.getLogger(NettyWebSocketClient.class);
+    // private static Logger logger = LoggerFactory.getLogger(NettyWebSocketClient.class);
 
     private Channel channel;
     private Boolean channelInitialized = false;
@@ -52,7 +52,7 @@ public class NettyWebSocketClient implements Runnable {
                 try {
                     this.wait();
                 } catch (InterruptedException e) {
-                    ErrorPrintUtil.printErrorMsg(logger, e);
+                    ErrorPrintUtil.printErrorMsg(log, e);
                 }
             }
         }
@@ -92,14 +92,14 @@ public class NettyWebSocketClient implements Runnable {
                 this.notify();
             }
             channelInitialized = true;
-            logger.info(">>>>> NETTY WEBSOCKET CLIENT START TO CONNECT SERVER, HOST: {}, PORT: {}", host, port);
+            log.info(">>>>> NETTY WEBSOCKET CLIENT START TO CONNECT SERVER, HOST: {}, PORT: {}", host, port);
 
             handler.handshakeFuture().sync();
 
             // // 线程要阻塞住，不然会退出
             Thread.currentThread().join();
         } catch (Exception e) {
-            ErrorPrintUtil.printErrorMsg(logger, e);
+            ErrorPrintUtil.printErrorMsg(log, e);
         } finally {
             workerGroup.shutdownGracefully();
         }
@@ -131,7 +131,7 @@ public class NettyWebSocketClient implements Runnable {
                         TimeUnit.MINUTES.sleep(5);
                         // TimeUnit.SECONDS.sleep(15);
                     } catch (Exception e) {
-                        ErrorPrintUtil.printErrorMsg(logger, e);
+                        ErrorPrintUtil.printErrorMsg(log, e);
                     }
                 }
             }).start();

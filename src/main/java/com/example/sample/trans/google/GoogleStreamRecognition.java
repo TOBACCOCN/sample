@@ -23,8 +23,7 @@ import com.google.api.gax.rpc.ResponseObserver;
 import com.google.api.gax.rpc.StreamController;
 import com.google.cloud.speech.v1p1beta1.*;
 import com.google.protobuf.ByteString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -32,9 +31,10 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 public class GoogleStreamRecognition {
 
-    private static Logger logger = LoggerFactory.getLogger(GoogleStreamRecognition.class);
+    // private static Logger logger = LoggerFactory.getLogger(GoogleStreamRecognition.class);
 
     private static final String RED = "\033[0;31m";
     private static final String GREEN = "\033[0;32m";
@@ -100,7 +100,7 @@ public class GoogleStreamRecognition {
                         .setStreamingConfig(streamingRecognitionConfig)
                         .build();
         // 发送音频元数据等信息
-        logger.info(">>>>> SENDING CONFIG_DATA: {}", request);
+        log.info(">>>>> SENDING CONFIG_DATA: {}", request);
         clientStream.send(request);
     }
 
@@ -122,7 +122,7 @@ public class GoogleStreamRecognition {
 
         @Override
         public void onStart(StreamController streamController) {
-            logger.info(">>>>> ON_START");
+            log.info(">>>>> ON_START");
         }
 
         @Override
@@ -132,20 +132,20 @@ public class GoogleStreamRecognition {
                 StreamingRecognitionResult result = resultsList.get(0);
                 SpeechRecognitionAlternative alternative = result.getAlternativesList().get(0);
                 if (result.getIsFinal()) {
-                    logger.info(">>>>> RESULT: {}", alternative.getTranscript());
+                    log.info(">>>>> RESULT: {}", alternative.getTranscript());
                 }
             }
         }
 
         @Override
         public void onError(Throwable throwable) {
-            logger.info(">>>>> ON_ERROR");
-            ErrorPrintUtil.printErrorMsg(logger, throwable);
+            log.info(">>>>> ON_ERROR");
+            ErrorPrintUtil.printErrorMsg(log, throwable);
         }
 
         @Override
         public void onComplete() {
-            logger.info(">>>>> ON_COMPLETE");
+            log.info(">>>>> ON_COMPLETE");
         }
     }
 

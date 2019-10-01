@@ -10,8 +10,7 @@ import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.multipart.HttpPostRequestEncoder;
 import io.netty.util.AsciiString;
 import io.netty.util.CharsetUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,9 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class NettyHttpClientHandler extends SimpleChannelInboundHandler<HttpContent> {
 
-    private static Logger logger = LoggerFactory.getLogger(NettyHttpClientHandler.class);
+    // private static Logger logger = LoggerFactory.getLogger(NettyHttpClientHandler.class);
 
     private HttpMethod method;
 
@@ -53,13 +53,13 @@ public class NettyHttpClientHandler extends SimpleChannelInboundHandler<HttpCont
         if (msg instanceof HttpResponse) {
             HttpResponse response = (HttpResponse) msg;
             response.headers().entries().forEach(entry -> {
-                logger.info(">>>>> RESPONSE_HEADER: {} = {}", entry.getKey(), entry.getValue());
+                log.info(">>>>> RESPONSE_HEADER: {} = {}", entry.getKey(), entry.getValue());
             });
             if (msg.content() == null) {
-                logger.info(">>>>> ORGIN_RESPONSE_BODY: {}", msg.content());
+                log.info(">>>>> ORGIN_RESPONSE_BODY: {}", msg.content());
                 return;
             }
-            logger.info(">>>>> ORGIN_RESPONSE_BODY: {}", msg.content().toString(CharsetUtil.UTF_8));
+            log.info(">>>>> ORGIN_RESPONSE_BODY: {}", msg.content().toString(CharsetUtil.UTF_8));
             if (HttpHeaderValues.APPLICATION_OCTET_STREAM.toString()
                     .equals(response.headers().get(HttpHeaderNames.CONTENT_TYPE))) {
                 String filename = response.headers().get(HttpHeaderNames.CONTENT_DISPOSITION).split(";")[1]
@@ -101,7 +101,7 @@ public class NettyHttpClientHandler extends SimpleChannelInboundHandler<HttpCont
                 try {
                     encoder.addBodyAttribute(key, value);
                 } catch (HttpPostRequestEncoder.ErrorDataEncoderException e) {
-                    ErrorPrintUtil.printErrorMsg(logger, e);
+                    ErrorPrintUtil.printErrorMsg(log, e);
                 }
             });
 
@@ -116,7 +116,7 @@ public class NettyHttpClientHandler extends SimpleChannelInboundHandler<HttpCont
                         // 但是会导致传多个文件时，只能传过去最后一个
                         encoder.addBodyFileUpload(file.getName(), file, null, false);
                     } catch (HttpPostRequestEncoder.ErrorDataEncoderException e) {
-                        ErrorPrintUtil.printErrorMsg(logger, e);
+                        ErrorPrintUtil.printErrorMsg(log, e);
                     }
                 }
             });
@@ -171,7 +171,7 @@ public class NettyHttpClientHandler extends SimpleChannelInboundHandler<HttpCont
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         // 出现异常，关闭通道
-        ErrorPrintUtil.printErrorMsg(logger, cause);
+        ErrorPrintUtil.printErrorMsg(log, cause);
         if (ctx != null && ctx.channel().isActive()) {
             ctx.close();
         }

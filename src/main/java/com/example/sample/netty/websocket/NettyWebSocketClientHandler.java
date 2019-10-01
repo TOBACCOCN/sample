@@ -5,12 +5,12 @@ import com.example.sample.util.ErrorPrintUtil;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.websocketx.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class NettyWebSocketClientHandler extends SimpleChannelInboundHandler<Object> {
 
-    private static Logger logger = LoggerFactory.getLogger(NettyWebSocketClientHandler.class);
+    // private static Logger logger = LoggerFactory.getLogger(NettyWebSocketClientHandler.class);
 
     private static final String MESSAGE = "message";
     private static final String MESSAGE_CONNECT_SUCCESS = "connect success";
@@ -37,7 +37,7 @@ public class NettyWebSocketClientHandler extends SimpleChannelInboundHandler<Obj
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) {
-        logger.info(">>>>> RECEIVING MESSAGE: {}", msg.toString());
+        log.info(">>>>> RECEIVING MESSAGE: {}", msg.toString());
         Channel channel = ctx.channel();
         if (!handshaker.isHandshakeComplete()) {
             handshaker.finishHandshake(channel, (FullHttpResponse) msg);
@@ -45,13 +45,13 @@ public class NettyWebSocketClientHandler extends SimpleChannelInboundHandler<Obj
         }
 
         if (msg instanceof CloseWebSocketFrame) {
-            logger.info(">>>>> CLOSE WEBSOCKET FROM SERVER");
+            log.info(">>>>> CLOSE WEBSOCKET FROM SERVER");
             handshaker.close(channel, ((CloseWebSocketFrame) msg).retain());
         } else if (msg instanceof PongWebSocketFrame) {
-            logger.info(">>>>> PONG FROM SERVER");
+            log.info(">>>>> PONG FROM SERVER");
         } else if (msg instanceof TextWebSocketFrame) {
             String text = ((TextWebSocketFrame) msg).text();
-            logger.info("TEXT_MESSAGE: {}", text);
+            log.info("TEXT_MESSAGE: {}", text);
 
             JSONObject jsonObject = JSONObject.parseObject(text);
             if (MESSAGE_CONNECT_SUCCESS.equals(jsonObject.getString(MESSAGE))) {
@@ -70,7 +70,7 @@ public class NettyWebSocketClientHandler extends SimpleChannelInboundHandler<Obj
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        ErrorPrintUtil.printErrorMsg(logger, cause);
+        ErrorPrintUtil.printErrorMsg(log, cause);
         ctx.close();
     }
 

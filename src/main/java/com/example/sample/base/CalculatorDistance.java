@@ -1,33 +1,33 @@
 package com.example.sample.base;
 
 import com.example.sample.util.ErrorPrintUtil;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
+@Slf4j
 public class CalculatorDistance {
 
-    private static Logger logger = LoggerFactory.getLogger(CalculatorDistance.class);
+    // private static Logger logger = LoggerFactory.getLogger(CalculatorDistance.class);
 
     public static void main(String[] args) {
         // String start = "浙江省杭州市西湖区";
         // String end = "郑州市金水区";
         // String startLngLat = getLngLat(start);
         // String endLngLat = getLngLat(end);
-        // logger.info(">>>>> START_LNGLAT: {}", startLngLat);
-        // logger.info(">>>>> END_LNGLAT: {}", endLngLat);
+        // log.info(">>>>> START_LNGLAT: {}", startLngLat);
+        // log.info(">>>>> END_LNGLAT: {}", endLngLat);
 
         String startLngLat = "113.924624,22.504315";
         String endLngLat = "113.924002,22.502828";
 
         Long distance = getDistance(startLngLat, endLngLat);
-        logger.info(">>>>> DISTANCE: [{}]", distance);
+        log.info(">>>>> DISTANCE: [{}]", distance);
     }
 
     private static String getLngLat(String address) {
@@ -63,7 +63,7 @@ public class CalculatorDistance {
             }
             in.close();
         } catch (Exception e) {
-            ErrorPrintUtil.printErrorMsg(logger, e);
+            ErrorPrintUtil.printErrorMsg(log, e);
         }
         return result.toString();
     }

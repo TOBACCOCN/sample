@@ -1,17 +1,17 @@
 package com.example.sample.mina;
 
 import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 public class MinaServerHandler extends IoHandlerAdapter {
 
-    private static Logger logger = LoggerFactory.getLogger(MinaServerHandler.class);
+    // private static Logger logger = LoggerFactory.getLogger(MinaServerHandler.class);
 
     private static Map<String, IoSession> requestId2SessionMap = new ConcurrentHashMap<>();
     private static Map<IoSession, String> session2RequestIdMap = new ConcurrentHashMap<>();
@@ -21,13 +21,13 @@ public class MinaServerHandler extends IoHandlerAdapter {
     }
 
     public void sessionCreated(IoSession session) {
-        logger.info(">>>>> SESSION CREATED, SESSION_ID: {}, REMOTE: {}",
+        log.info(">>>>> SESSION CREATED, SESSION_ID: {}, REMOTE: {}",
                 session.getId(), session.getRemoteAddress().toString());
     }
 
     @SuppressWarnings("unchecked")
     public void messageReceived(IoSession session, Object message) {
-        logger.info(">>>>> RECEIVE MSG : {}, SESSION_ID: {}", message, session.getId());
+        log.info(">>>>> RECEIVE MSG : {}, SESSION_ID: {}", message, session.getId());
         Map<String, String> map = JSON.parseObject((String) message, Map.class);
         String requestId = map.get("requestId");
         if (requestId != null) {
@@ -37,7 +37,7 @@ public class MinaServerHandler extends IoHandlerAdapter {
     }
 
     public void sessionClosed(IoSession session) {
-        logger.info(">>>>> SESSION CLOSED, SESSION_ID: {}, REMOTE: {}", session.getId(), session.getRemoteAddress().toString());
+        log.info(">>>>> SESSION CLOSED, SESSION_ID: {}, REMOTE: {}", session.getId(), session.getRemoteAddress().toString());
         String requestId = session2RequestIdMap.get(session);
         if (requestId != null) {
             requestId2SessionMap.remove(requestId);
