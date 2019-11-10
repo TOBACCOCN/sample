@@ -56,7 +56,7 @@ public class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObje
 		FullHttpRequest request = (FullHttpRequest) msg;
 		// 1. 请求方法（GET、POST。。。）
 		HttpMethod method = request.method();
-		log.info(">>>>> REQ_METHOD: {}", method);
+		log.info(">>>>> REQ_METHOD: [{}]", method);
 		if (!HttpMethod.GET.equals(method) && !HttpMethod.POST.equals(method)) {
 			ctx.writeAndFlush(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.METHOD_NOT_ALLOWED))
 					.addListener(ChannelFutureListener.CLOSE);
@@ -64,11 +64,11 @@ public class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObje
 		}
 		// 2. 请求地址 uri
 		String uri = request.uri();
-		log.info(">>>>> REQ_URI: {}", uri);
+		log.info(">>>>> REQ_URI: [{}]", uri);
 		// 3. 请求头
 		HttpHeaders headers = request.headers();
 		headers.entries().forEach(entry -> {
-			log.info(">>>>> REQ_HEADER: {} = {}", entry.getKey(), entry.getValue());
+			log.info(">>>>> REQ_HEADER: [{}] = [{}]", entry.getKey(), entry.getValue());
 		});
 
 		ChannelFuture channel = null;
@@ -79,7 +79,7 @@ public class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObje
 			if (uri.endsWith(downloadUri)) { // 下载文件
 				File file = new File(targetDownloadFilePath);
 				if (!file.exists()) {
-					log.info(">>>>> FILE NOT EXISTS: {}", file.getPath());
+					log.info(">>>>> FILE NOT EXISTS: [{}]", file.getPath());
 					response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR);
 					ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
 					return;
@@ -103,7 +103,7 @@ public class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObje
 				Map<String, List<String>> parameters = decoder.parameters();
 				parameters.entrySet().forEach(key -> {
 					// 4.1 GET 请求参数
-					log.info(">>>>> REQ_PARAM: {}", key);
+					log.info(">>>>> REQ_PARAM: [{}]", key);
 				});
 				respByteBuf = Unpooled.copiedBuffer(JSON.toJSONString(parameters).getBytes());
 				response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK,
@@ -117,7 +117,7 @@ public class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObje
 		else if (HttpMethod.POST.equals(method)) {
 			String contentType = headers.get(HttpHeaderNames.CONTENT_TYPE);
 			String reqBody = request.content().toString(CharsetUtil.UTF_8);
-			log.info(">>>>> ORIGIN_REQ_BODY: {}", reqBody);
+			log.info(">>>>> ORIGIN_REQ_BODY: [{}]", reqBody);
 
 			// Content-Type 不是
 			// application/json、application/x-www-form-urlencoded、multipart/form-data
@@ -133,7 +133,7 @@ public class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObje
 			// 5.1 application/json （json 数据）
 			if (HttpHeaderValues.APPLICATION_JSON.toString().equals(contentType)) {
 				Map<String, Object> map = JSON.toJavaObject(JSONObject.parseObject(reqBody), Map.class);
-				log.info(">>>>> REQ_JSON: {}", map);
+				log.info(">>>>> REQ_JSON: [{}]", map);
 				respByteBuf = Unpooled.copiedBuffer(JSON.toJSONString(map).getBytes());
 			}
 			// 5.2 application/x-www-form-urlencoded （表单提交）
@@ -143,7 +143,7 @@ public class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObje
 				QueryStringDecoder decoder = new QueryStringDecoder(reqBody, false);
 				Map<String, List<String>> parameters = decoder.parameters();
 				parameters.forEach((key, value) -> {
-					log.info(">>>>> REQ_PARAM: {} = {}", key, value);
+					log.info(">>>>> REQ_PARAM: [{}] = [{}]", key, value);
 					map.put(key, value);
 				});
 				// 5.2.2 通过 HttpPostRequestDecoder 解析参数
@@ -153,7 +153,7 @@ public class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObje
 				// datas.forEach(data -> {
 				// 	Attribute attribute = (Attribute) data;
 				// 	try {
-				// 		log.info(">>>>> REQ_PARAM: {} = {}", attribute.getName(), attribute.getValue());
+				// 		log.info(">>>>> REQ_PARAM: [{}] = [{}]", attribute.getName(), attribute.getValue());
 				// 		map.put(attribute.getName(), attribute.getValue());
 				// 	} catch (IOException e) {
 				// 		ErrorPrintUtil.printErrorMsg(log, e);
@@ -174,7 +174,7 @@ public class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObje
 					if (data.getHttpDataType() == HttpDataType.Attribute) {
 						Attribute attribute = (Attribute) data;
 						try {
-							log.info(">>>>> REQ_PARAM: {} = {}", attribute.getName(), attribute.getValue());
+							log.info(">>>>> REQ_PARAM: [{}] = [{}]", attribute.getName(), attribute.getValue());
 							map.put(attribute.getName(), attribute.getValue());
 						} catch (IOException e) {
 							ErrorPrintUtil.printErrorMsg(log, e);
@@ -184,7 +184,7 @@ public class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObje
 					else if (data.getHttpDataType() == HttpDataType.FileUpload) {
 						FileUpload fileUpload = (FileUpload) data;
 						String filename = fileUpload.getFilename();
-						log.info(">>>>> REQ_PARAM: {} = {}", HttpHeaderValues.FILENAME.toString(), filename);
+						log.info(">>>>> REQ_PARAM: [{}] = [{}]", HttpHeaderValues.FILENAME.toString(), filename);
 						if (fileUpload.isCompleted()) {
 							try {
 								fileUpload.renameTo(new File(uploadDir, filename));

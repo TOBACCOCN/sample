@@ -31,7 +31,7 @@ public class Recursion {
         char assist = 'b';
         char destination = 'c';
         long hanoi = hanoi(n, origin, assist, destination);
-        log.info(">>>>> HANOI: {}", hanoi);
+        log.info(">>>>> HANOI: [{}]", hanoi);
     }
 
 }

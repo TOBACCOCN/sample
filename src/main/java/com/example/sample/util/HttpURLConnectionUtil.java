@@ -55,9 +55,9 @@ public class HttpURLConnectionUtil {
     private static String getResponse(HttpURLConnection connection) throws IOException {
         // connection.connect();
         int responseCode = connection.getResponseCode();
-        log.info(">>>>> RESPONSE_CODE: {}", responseCode);
+        log.info(">>>>> RESPONSE_CODE: [{}]", responseCode);
         if (responseCode != HttpURLConnection.HTTP_OK) {
-            log.info(">>>>> RESPONSE_MESSAGE: {}", connection.getResponseMessage());
+            log.info(">>>>> RESPONSE_MESSAGE: [{}]", connection.getResponseMessage());
             return "";
         } else {
             log.info(">>>>> RESPONSE SUCCESS");
@@ -228,9 +228,9 @@ public class HttpURLConnectionUtil {
         HttpURLConnection connection = getConnection(url);
         connection.setRequestMethod("GET");
         int responseCode = connection.getResponseCode();
-        log.info(">>>>> RESPONSE_CODE: {}", responseCode);
+        log.info(">>>>> RESPONSE_CODE: [{}]", responseCode);
         if (responseCode != HttpURLConnection.HTTP_OK) {
-            log.info(">>>>> RESPONSE_MESSAGE: {}", connection.getResponseMessage());
+            log.info(">>>>> RESPONSE_MESSAGE: [{}]", connection.getResponseMessage());
         } else {
             log.info(">>>>> RESPONSE SUCCESS");
             InputStream inputStream = connection.getInputStream();
@@ -245,7 +245,7 @@ public class HttpURLConnectionUtil {
             if (!filename.matches("[^\\s\\\\/:\\*\\?\\\"<>\\|](\\x20|[^\\s\\\\/:\\*\\?\\\"<>\\|])*[^\\s\\\\/:\\*\\?\\\"<>\\|\\.]$")) {
                 filename = System.currentTimeMillis() + externalName;
             }
-            log.info(">>>>> FILENAME: {}", filename);
+            log.info(">>>>> FILENAME: [{}]", filename);
             File file = new File(downloadDir + filename);
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();

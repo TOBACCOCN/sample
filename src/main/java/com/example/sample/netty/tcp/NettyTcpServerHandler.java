@@ -23,7 +23,7 @@ public class NettyTcpServerHandler extends SimpleChannelInboundHandler<String> {
     @Override
     @SuppressWarnings("unchecked")
     public void channelRead0(ChannelHandlerContext ctx, String msg) {
-        log.info(">>>>> RECEIVING MESSAGE: {}", msg);
+        log.info(">>>>> RECEIVING MESSAGE: [{}]", msg);
         Channel channel = ctx.channel();
         if (TcpChannelManager.getRequestId(channel) == null) {
             try {
@@ -48,7 +48,7 @@ public class NettyTcpServerHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        log.info(">>>>> CLIENT CONNECTED, CHANNELID:{}, ADDRESS: {}",
+        log.info(">>>>> CLIENT CONNECTED, CHANNELID:[{}], ADDRESS: [{}]",
                 ctx.channel().id(), ctx.channel().remoteAddress());
     }
 

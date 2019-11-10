@@ -29,7 +29,7 @@ public class MinaServer {
         ioAcceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
         try {
             ioAcceptor.bind(new InetSocketAddress(port));
-            log.info(">>>>> MINA SERVER STARTED, PORT: {}", port);
+            log.info(">>>>> MINA SERVER STARTED, PORT: [{}]", port);
         } catch (IOException e) {
             ErrorPrintUtil.printErrorMsg(log, e);
             ioAcceptor.dispose();

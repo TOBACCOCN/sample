@@ -30,12 +30,12 @@ public class CrawlingCommentsAboutDivorceOfMayiliAndWenzhang {
         String filePath = "D:/mayili.csv";
         BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
         for (int i = 1; i <= pages; i++) {
-            log.info(">>>>> PAGE: {}", i);
+            log.info(">>>>> PAGE: [{}]", i);
             String url = "https://weibo.com/aj/v6/comment/big?ajwvr=6&id=4399042567665659&page=" + i;
             String result = HttpURLConnectionUtil.httpGet(url, headerMap);
             JSONObject jsonObject = JSONObject.parseObject(result);
             String html = jsonObject.getJSONObject("data").getString("html");
-            log.info(">>>>> HTML: {}", html);
+            log.info(">>>>> HTML: [{}]", html);
             Document document = Jsoup.parse(html);
             Elements elements = document.select("div.WB_text");
             for (Element element : elements) {
@@ -43,7 +43,7 @@ public class CrawlingCommentsAboutDivorceOfMayiliAndWenzhang {
                 String[] array = text.split("：");
                 if (array.length > 1) {
                     String comment = array[1];
-                    log.info(">>>>> COMMENT: {}", comment);
+                    log.info(">>>>> COMMENT: [{}]", comment);
                     writer.write(comment);
                     writer.newLine();
                     writer.flush();

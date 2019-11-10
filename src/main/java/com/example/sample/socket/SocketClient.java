@@ -16,7 +16,7 @@ public class SocketClient {
     private static Socket connectServer(String host, int port) {
         try {
             Socket socket = new Socket(host, port);
-            log.info(">>>>> CONNECT SERVER SUCCESS, HOST: {}, PORT: {}", host, port);
+            log.info(">>>>> CONNECT SERVER SUCCESS, HOST: [{}], PORT: [{}]", host, port);
 
             new Thread(() -> {
                 while (true) {
@@ -27,7 +27,7 @@ public class SocketClient {
                         BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                         String message = reader.readLine();
                         if (message != null) {
-                            log.info(">>>>> RECEIVE MSG: {}", message);
+                            log.info(">>>>> RECEIVE MSG: [{}]", message);
                         }
                     } catch (Exception e) {
                         ErrorPrintUtil.printErrorMsg(log, e);

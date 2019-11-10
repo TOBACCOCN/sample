@@ -21,7 +21,7 @@ public class GoogleTranslation {
         Translation translation =
                 translate.translate(text, Translate.TranslateOption.sourceLanguage("en"),
                         Translate.TranslateOption.targetLanguage("ru"));
-        log.info(">>>>> TRANSLATION: {}", translation.getTranslatedText());
+        log.info(">>>>> TRANSLATION: [{}]", translation.getTranslatedText());
     }
 
 }

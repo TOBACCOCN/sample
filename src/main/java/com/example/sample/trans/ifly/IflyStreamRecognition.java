@@ -4,14 +4,10 @@ import com.example.sample.util.ErrorPrintUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.HttpUrl;
-import okhttp3.Response;
-import okhttp3.WebSocket;
-import okhttp3.WebSocketListener;
+import okhttp3.*;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -52,21 +48,15 @@ public class IflyStreamRecognition {
     private static long begin = System.currentTimeMillis();
 
     public static void main(String[] args) throws Exception {
-        // // 构建鉴权 url
-        // String authUrl = getAuthUrl();
-        // OkHttpClient client = new OkHttpClient.Builder().build();
-        // //将url中的 schema http:// 和 https:// 分别替换为 ws:// 和 wss://
-        // String url = authUrl.replace("https://", "wss://");
-        // log.info(">>>>> URL: {}", url);
-        //
-        // Request request = new Request.Builder().url(url).build();
-        // client.newWebSocket(request, new IflyWebsocketListener());
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream("abcd".getBytes());
-        byte[] buf = new byte[2];
-        int len;
-        while ((len = byteArrayInputStream.read(buf)) != -1) {
-            System.out.println(new String(Arrays.copyOf(buf, len)));
-        }
+        // 构建鉴权 url
+        String authUrl = getAuthUrl();
+        OkHttpClient client = new OkHttpClient.Builder().build();
+        //将url中的 schema http:// 和 https:// 分别替换为 ws:// 和 wss://
+        String url = authUrl.replace("https://", "wss://");
+        log.info(">>>>> URL: [{}]", url);
+
+        Request request = new Request.Builder().url(url).build();
+        client.newWebSocket(request, new IflyWebsocketListener());
     }
 
     private static String getAuthUrl() throws Exception {
@@ -85,7 +75,7 @@ public class IflyStreamRecognition {
 
         String authorization = String.format("api_key=\"%s\", algorithm=\"%s\", headers=\"%s\", signature=\"%s\"",
                 apiKey, "hmac-sha256", "host date request-line", sha);
-        log.info(">>>>> AUTHORIZATION: {}", authorization);
+        log.info(">>>>> AUTHORIZATION: [{}]", authorization);
 
         HttpUrl httpUrl = Objects.requireNonNull(HttpUrl.parse(url)).newBuilder().
                 addQueryParameter("authorization", Base64.getEncoder().encodeToString(authorization.getBytes(charset))).
@@ -102,7 +92,7 @@ public class IflyStreamRecognition {
             super.onOpen(webSocket, response);
             //连接成功，开始发送数据
             Thread thread = Thread.currentThread();
-            log.info(">>>>> CURRENT_THREAD: {}", thread);
+            log.info(">>>>> CURRENT_THREAD: [{}]", thread);
             startSendDataAThread(webSocket);
 
         }
@@ -207,9 +197,9 @@ public class IflyStreamRecognition {
         @Override
         public void onMessage(WebSocket webSocket, String text) {
             super.onMessage(webSocket, text);
-            log.info(">>>>> ON_MESSAGE: {}", text);
+            log.info(">>>>> ON_MESSAGE: [{}]", text);
             Thread thread = Thread.currentThread();
-            log.info(">>>>> CURRENT_THREAD: {}", thread);
+            log.info(">>>>> CURRENT_THREAD: [{}]", thread);
             ResponseData response = json.fromJson(text, ResponseData.class);
             if (response != null) {
                 if (response.getCode() != 0) {
@@ -221,14 +211,14 @@ public class IflyStreamRecognition {
                         Text result = response.getData().getResult().getText();
                         try {
                             decoder.decode(result);
-                            log.info(">>>>> RESULT: {}", decoder.toString());
+                            log.info(">>>>> RESULT: [{}]", decoder.toString());
                         } catch (Exception e) {
                             ErrorPrintUtil.printErrorMsg(log, e);
                         }
                     }
                     if (response.getData().getStatus() == 2) {
                         log.info(">>>>> COST: [{}] MS", System.currentTimeMillis() - begin);
-                        log.info(">>>>> FINAL_RESULT: {}", decoder.toString());
+                        log.info(">>>>> FINAL_RESULT: [{}]", decoder.toString());
                         decoder.discard();
                         // webSocket.close(0, "");
                     }

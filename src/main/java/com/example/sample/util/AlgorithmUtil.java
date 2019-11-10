@@ -13,8 +13,8 @@ public class AlgorithmUtil {
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
         String key = "zhangyonghong";
-        log.info(">>>>> {}: {}", key, MD5(key));
-        log.info(">>>>> {}: {}", key, SHA(key));
+        log.info(">>>>> [{}]: [{}]", key, MD5(key));
+        log.info(">>>>> [{}]: [{}]", key, SHA(key));
     }
 
     public static String MD5(String key) throws NoSuchAlgorithmException {

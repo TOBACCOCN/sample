@@ -47,7 +47,7 @@ public class AliyunTranslation {
             //目标语言
             eCommerceRequest.setTargetLanguage("en");
             TranslateECommerceResponse eCommerceResponse = client.getAcsResponse(eCommerceRequest);
-            log.info(">>>>> TRANSLATION_RESULT: {}", JSONObject.toJSON(eCommerceResponse));
+            log.info(">>>>> TRANSLATION_RESULT: [{}]", JSONObject.toJSON(eCommerceResponse));
         } catch (Exception e) {
             ErrorPrintUtil.printErrorMsg(log, e);
         }

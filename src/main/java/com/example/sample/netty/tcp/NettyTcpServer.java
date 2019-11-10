@@ -60,7 +60,7 @@ public class NettyTcpServer implements Runnable {
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
             ChannelFuture future = bootstrap.bind(port).sync();
-            log.info(">>>>> NETTY TCP SERVER STARTING, PORT: {}", port);
+            log.info(">>>>> NETTY TCP SERVER STARTING, PORT: [{}]", port);
             future.channel().closeFuture().sync();
         } catch (Exception e) {
             ErrorPrintUtil.printErrorMsg(log, e);

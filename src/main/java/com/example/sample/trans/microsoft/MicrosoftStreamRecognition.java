@@ -115,13 +115,13 @@ public class MicrosoftStreamRecognition {
             // 识别中
             // 以下日志输出用于调试
             speechRecognizer.recognizing.addEventListener((s, e) ->
-                    log.info(">>>>> RECOGNIZING: {}", e.getResult().getText())
+                    log.info(">>>>> RECOGNIZING: [{}]", e.getResult().getText())
             );
 
             // 识别完成
             speechRecognizer.recognized.addEventListener((s, e) -> {
                 if (e.getResult().getReason() == ResultReason.RecognizedSpeech) {
-                    log.info(">>>>> RECOGNIZED: {}", e.getResult().getText());
+                    log.info(">>>>> RECOGNIZED: [{}]", e.getResult().getText());
                 } else if (e.getResult().getReason() == ResultReason.NoMatch) {
                     log.info(">>>>> NOMATCH: Speech could not be recognized.");
                 }

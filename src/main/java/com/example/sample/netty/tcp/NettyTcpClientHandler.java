@@ -25,7 +25,7 @@ public class NettyTcpClientHandler extends SimpleChannelInboundHandler<String> {
     @Override
     @SuppressWarnings("unchecked")
     protected void channelRead0(ChannelHandlerContext ctx, String msg) {
-        log.info(">>>> RECEIVING MESSAGE: {}", msg);
+        log.info(">>>> RECEIVING MESSAGE: [{}]", msg);
         try {
             Map<String, String> map = JSON.parseObject(msg, Map.class);
             if (MESSAGE_CONNECT_SUCCESS.equals(map.get(MESSAGE))) {

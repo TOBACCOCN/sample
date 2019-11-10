@@ -15,7 +15,7 @@ public class ApplicationContextTests {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
 		JedisCluster bean = (JedisCluster) context.getBean("jedisCluster");
 		bean.set("name", "zyh");
-		log.info(">>>>> NAME: {}", bean.get("name"));
+		log.info(">>>>> NAME: [{}]", bean.get("name"));
 		context.close();
 	}
 

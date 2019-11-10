@@ -32,7 +32,7 @@ public class AliyunSpeechTranscriber {
             String token = accessToken.getToken();
             long now = System.currentTimeMillis() / 1000;
             log.info(">>>>> TOKEN: [{}], EXPIRE_TIME: [{}]", token, accessToken.getExpireTime());
-            log.info(">>>>> TOKEN VALID_DURATION: {}", accessToken.getExpireTime() - now);
+            log.info(">>>>> TOKEN VALID_DURATION: [{}]", accessToken.getExpireTime() - now);
             // 创建 NlsClient 实例,应用全局创建一个即可，用户指定服务地址
             if (url.isEmpty()) {
                 client = new NlsClient(id, secret);
@@ -49,7 +49,7 @@ public class AliyunSpeechTranscriber {
             // 识别出中间结果。服务端识别出一个字或词时会返回此消息。仅当 setEnableIntermediateResult(true) 时，才会有此类消息返回
             @Override
             public void onTranscriptionResultChange(SpeechTranscriberResponse response) {
-                log.info(">>>>> ON_RESULT_CHANGE, TASK_ID: {}, NAME: {}, STATUS: {}, INDEX: {}, RESULT: {}, TIME: {}",
+                log.info(">>>>> ON_RESULT_CHANGE, TASK_ID: [{}], NAME: [{}], STATUS: [{}], INDEX: [{}], RESULT: [{}], TIME: [{}]",
                         response.getTaskId(),
                         response.getName(),
                         // 状态码 20000000 表示正常识别
@@ -73,13 +73,13 @@ public class AliyunSpeechTranscriber {
             // 识别语句开始
             @Override
             public void onSentenceBegin(SpeechTranscriberResponse response) {
-                log.info(">>>>> ON_BEGIN, TASK_ID: {}, NAME: {}, STATUS: {}", response.getTaskId(), response.getName(), response.getStatus());
+                log.info(">>>>> ON_BEGIN, TASK_ID: [{}], NAME: [{}], STATUS: [{}]", response.getTaskId(), response.getName(), response.getStatus());
             }
 
             // 识别出一句话。服务端会智能断句，当识别到一句话结束时会返回此消息
             @Override
             public void onSentenceEnd(SpeechTranscriberResponse response) {
-                log.info(">>>>> ON_END, TASK_ID: {}, NAME: {}, STATUS:{}, INDEX: {}, RESULT: {}, CONFIDENCE: {}, BEGIN_TIME: {}, TIME: {}",
+                log.info(">>>>> ON_END, TASK_ID: [{}], NAME: [{}], STATUS:[{}], INDEX: [{}], RESULT: [{}], CONFIDENCE: [{}], BEGIN_TIME: [{}], TIME: [{}]",
                         response.getTaskId(),
                         response.getName(),
                         // 状态码 20000000 表示正常识别
@@ -100,14 +100,14 @@ public class AliyunSpeechTranscriber {
             // 服务完毕
             @Override
             public void onTranscriptionComplete(SpeechTranscriberResponse response) {
-                log.info(">>>>> ON_COMPLETE, TASK_ID: {}, NAME: {}, STATUS: {}", response.getTaskId(), response.getName(), response.getStatus());
+                log.info(">>>>> ON_COMPLETE, TASK_ID: [{}], NAME: [{}], STATUS: [{}]", response.getTaskId(), response.getName(), response.getStatus());
             }
 
             // 识别失败
             @Override
             public void onFail(SpeechTranscriberResponse response) {
                 //  task_id 很重要，是调用方和服务端通信的唯一ID标识，当遇到问题时，需要提供此 task_id 以便排查
-                log.info(">>>>> ON_FAIL, TASK_ID: {}, STATUS: {}, STATUS_TEXT: {}",
+                log.info(">>>>> ON_FAIL, TASK_ID: [{}], STATUS: [{}], STATUS_TEXT: [{}]",
                         response.getTaskId(), response.getStatus(), response.getStatusText());
             }
         };
@@ -159,7 +159,7 @@ public class AliyunSpeechTranscriber {
             long now = System.currentTimeMillis();
             log.info(">>>>> ASR WAIT FOR COMPLETE");
             transcriber.stop();
-            log.info("ASR LATENCY: {} MS", System.currentTimeMillis() - now);
+            log.info("ASR LATENCY: [{}] MS", System.currentTimeMillis() - now);
         } catch (Exception e) {
             ErrorPrintUtil.printErrorMsg(log, e);
         } finally {

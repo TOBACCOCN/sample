@@ -26,6 +26,9 @@ public class YoudaoSpeechTranslation {
         String to = "en";
 
         recognizeAndTranslate(appKey, appSecret, filePath, from, to);
+
+        // 阻塞线程，不要退出
+        Thread.currentThread().join();
     }
 
     private static void recognizeAndTranslate(String appKey, String appSecret, String filePath, String from, String to) throws NoSuchAlgorithmException, IOException, DeploymentException, InterruptedException {
@@ -62,52 +65,16 @@ public class YoudaoSpeechTranslation {
     }
 
     private static String bytes2Hex(byte[] bytes) {
-        StringBuilder des = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         String tmp;
         for (byte b : bytes) {
             tmp = (Integer.toHexString(b & 0xFF));
             if (tmp.length() == 1) {
-                des.append("0");
+                builder.append("0");
             }
-            des.append(tmp);
+            builder.append(tmp);
         }
-        return des.toString();
-    }
-
-    @ClientEndpoint
-    public class YoudaoWebsocket {
-
-        private Session session;
-
-        @OnOpen
-        public void onOpen(Session session) {
-            log.info(">>>>> ON_OPEN");
-            this.session = session;
-        }
-
-        @OnMessage
-        public void onMessage(String message) throws IOException {
-            log.info(">>>>> ON_MESSAGE: {}", message);
-            if (message.contains("\"errorCode\":\"304\"")) {
-                onClose();
-            }
-
-        }
-
-        @OnError
-        public void onError(Throwable throwable) {
-            log.info(">>>>> WEBSOCKET ERROR OCCURRED");
-        }
-
-        @OnClose
-        public void onClose() throws IOException {
-            if (this.session.isOpen()) {
-                this.session.close();
-            }
-            log.info(">>>>> SESSION CLOSE");
-            System.exit(0);
-        }
-
+        return builder.toString();
     }
 
 }

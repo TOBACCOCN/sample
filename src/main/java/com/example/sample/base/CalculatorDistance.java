@@ -20,8 +20,8 @@ public class CalculatorDistance {
         // String end = "郑州市金水区";
         // String startLngLat = getLngLat(start);
         // String endLngLat = getLngLat(end);
-        // log.info(">>>>> START_LNGLAT: {}", startLngLat);
-        // log.info(">>>>> END_LNGLAT: {}", endLngLat);
+        // log.info(">>>>> START_LNGLAT: [{}]", startLngLat);
+        // log.info(">>>>> END_LNGLAT: [{}]", endLngLat);
 
         String startLngLat = "113.924624,22.504315";
         String endLngLat = "113.924002,22.502828";

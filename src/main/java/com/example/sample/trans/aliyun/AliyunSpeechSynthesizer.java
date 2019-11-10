@@ -33,7 +33,7 @@ public class AliyunSpeechSynthesizer {
             String token = accessToken.getToken();
             long now = System.currentTimeMillis() / 1000;
             log.info(">>>>> TOKEN: [{}], EXPIRE_TIME: [{}]", token, accessToken.getExpireTime());
-            log.info(">>>>> TOKEN VALID_DURATION: {}", accessToken.getExpireTime() - now);
+            log.info(">>>>> TOKEN VALID_DURATION: [{}]", accessToken.getExpireTime() - now);
             // 创建 NlsClient 实例,应用全局创建一个即可，用户指定服务地址
             if (url.isEmpty()) {
                 client = new NlsClient(accessToken.getToken());
@@ -56,9 +56,14 @@ public class AliyunSpeechSynthesizer {
                 //语音合成结束
                 @Override
                 public void onComplete(SpeechSynthesizerResponse response) {
-                    // 当 onComplete 时表示所有TTS数据已经接收完成，因此这个是整个合成延迟，该延迟可能较大，未必满足实时场景
-                    log.info(">>>>> ON_COMPLETE, NAME: {}, status: {}, output_FILE: {}",
+                    // 当 onComplete 时表示所有 TTS 数据已经接收完成，因此这个是整个合成延迟，该延迟可能较大，未必满足实时场景
+                    log.info(">>>>> ON_COMPLETE, NAME: [{}], STATUS: [{}], OUTPUT_FILE: [{}]",
                             response.getName(), response.getStatus(), file.getAbsolutePath());
+                    try {
+                        fos.close();
+                    } catch (IOException e) {
+                        ErrorPrintUtil.printErrorMsg(log, e);
+                    }
                 }
 
                 // 语音合成的语音二进制数据
@@ -82,11 +87,17 @@ public class AliyunSpeechSynthesizer {
                 @Override
                 public void onFail(SpeechSynthesizerResponse response) {
                     // task_id 很重要，是调用方和服务端通信的唯一 ID 标识，当遇到问题时，需要提供此 task_id 以便排查
-                    log.info(">>>>> ON_FAIL, TASK_ID: {}, STATUS: {}, STATUS_TEXT: {}", response.getTaskId(),
+                    log.info(">>>>> ON_FAIL, TASK_ID: [{}], STATUS: [{}], STATUS_TEXT: [{}]", response.getTaskId(),
                             // 状态码 20000000 表示识别成功
                             response.getStatus(),
                             // 错误信息
                             response.getStatusText());
+                    try {
+                        fos.close();
+                    } catch (IOException e) {
+                        ErrorPrintUtil.printErrorMsg(log, e);
+                    }
+                    file.delete();
                 }
             };
         } catch (Exception e) {
@@ -108,7 +119,7 @@ public class AliyunSpeechSynthesizer {
             // 发音人
             synthesizer.setVoice("siyue");
             // 语调，范围是-500~500，可选，默认是 0
-            synthesizer.setPitchRate(100);
+            synthesizer.setPitchRate(50);
             // 语速，范围是-500~500，默认是 0
             synthesizer.setSpeechRate(100);
             // 设置用于语音合成的文本

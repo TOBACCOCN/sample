@@ -18,9 +18,9 @@ public class LeetCode {
 
     private static int assignCookies(int[] children, int[] cookies) {
         Arrays.sort(children);
-        log.info(">>>>> SORTED CHILDREN: {}", children);
+        log.info(">>>>> SORTED CHILDREN: [{}]", children);
         Arrays.sort(cookies);
-        log.info(">>>>> SORTED COOKIES: {}", cookies);
+        log.info(">>>>> SORTED COOKIES: [{}]", cookies);
         int result = 0;
         int i = 0, j = 0;
         while (i < children.length && j < cookies.length) {
@@ -170,7 +170,7 @@ public class LeetCode {
     @Test
     public void sqrt() {
         int n = LeetCode.sqrt(1058);
-        log.info(">>>>> n: {}", n);
+        log.info(">>>>> n: [{}]", n);
     }
 
     @Test
@@ -180,10 +180,10 @@ public class LeetCode {
         combination(result, "", 15, 0);
         long end = System.currentTimeMillis();
         // for (String string : list) {
-        //     log.info(">>>>> {}", string);
+        //     log.info(">>>>> [{}]", string);
         // }
         log.info(">>>>> SIZE: [{}]", result.size());
-        log.info(">>>>> COST: [{}] ms", end - begin);
+        log.info(">>>>> COST: [{}] MS", end - begin);
     }
 
     @Test
@@ -193,15 +193,15 @@ public class LeetCode {
         Random random = new Random((int) (Math.random() * max) + 1);
 
         int[] children = generateArray(random, max);
-        log.info(">>>>> CHILDREN: {}", children);
+        log.info(">>>>> CHILDREN: [{}]", children);
 
         int[] cookies = generateArray(random, max);
-        log.info(">>>>> COOKIES: {}", cookies);
+        log.info(">>>>> COOKIES: [{}]", cookies);
 
         long start = System.currentTimeMillis();
         int result = assignCookies(children, cookies);
-        log.info(">>>>> COST: {} ms", System.currentTimeMillis() - start);
-        log.info(">>>>> RESULT: {}", result);
+        log.info(">>>>> COST: [{}] MS", System.currentTimeMillis() - start);
+        log.info(">>>>> RESULT: [{}]", result);
     }
 
     private int[] generateArray(Random random, int max) {

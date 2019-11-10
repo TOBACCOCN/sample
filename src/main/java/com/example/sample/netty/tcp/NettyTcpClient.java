@@ -72,7 +72,7 @@ public class NettyTcpClient implements Runnable {
                         }
                     });
             ChannelFuture future = bootstrap.connect(host, port).sync();
-            log.info(">>>>> NETTY TCP CLIENT START TO CONNECT SERVER, HOST: {}, PORT: {}", host, port);
+            log.info(">>>>> NETTY TCP CLIENT START TO CONNECT SERVER, HOST: [{}], PORT: [{}]", host, port);
             synchronized (this) {
                 channel = future.channel();
                 this.notify();

@@ -102,13 +102,13 @@ public class YoudaoTTS {
      * @return 响应的字节数组
      */
     private static byte[] requestTTS(String url) throws IOException {
-        log.info(">>>>> REQUEST URL: {}", url);
+        log.info(">>>>> REQUEST URL: [{}]", url);
 
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpGet httpGet = new HttpGet(url);
         CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
         Header[] contentType = httpResponse.getHeaders("Content-Type");
-        log.info(">>>>> RESPONSE CONTENT-TYPE: {}", contentType[0].getValue());
+        log.info(">>>>> RESPONSE CONTENT-TYPE: [{}]", contentType[0].getValue());
 
         byte[] result = null;
         //如果响应是 wav
@@ -123,7 +123,7 @@ public class YoudaoTTS {
             HttpEntity httpEntity = httpResponse.getEntity();
             String json = EntityUtils.toString(httpEntity, StandardCharsets.UTF_8);
             EntityUtils.consume(httpEntity);
-            log.info(">>>>> ORIGIN_RESULT: {}", json);
+            log.info(">>>>> ORIGIN_RESULT: [{}]", json);
         }
 
         httpResponse.close();

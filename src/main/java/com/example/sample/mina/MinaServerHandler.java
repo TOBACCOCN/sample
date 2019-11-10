@@ -21,13 +21,13 @@ public class MinaServerHandler extends IoHandlerAdapter {
     }
 
     public void sessionCreated(IoSession session) {
-        log.info(">>>>> SESSION CREATED, SESSION_ID: {}, REMOTE: {}",
+        log.info(">>>>> SESSION CREATED, SESSION_ID: [{}], REMOTE: [{}]",
                 session.getId(), session.getRemoteAddress().toString());
     }
 
     @SuppressWarnings("unchecked")
     public void messageReceived(IoSession session, Object message) {
-        log.info(">>>>> RECEIVE MSG : {}, SESSION_ID: {}", message, session.getId());
+        log.info(">>>>> RECEIVE MSG : [{}], SESSION_ID: [{}]", message, session.getId());
         Map<String, String> map = JSON.parseObject((String) message, Map.class);
         String requestId = map.get("requestId");
         if (requestId != null) {
@@ -37,7 +37,7 @@ public class MinaServerHandler extends IoHandlerAdapter {
     }
 
     public void sessionClosed(IoSession session) {
-        log.info(">>>>> SESSION CLOSED, SESSION_ID: {}, REMOTE: {}", session.getId(), session.getRemoteAddress().toString());
+        log.info(">>>>> SESSION CLOSED, SESSION_ID: [{}], REMOTE: [{}]", session.getId(), session.getRemoteAddress().toString());
         String requestId = session2RequestIdMap.get(session);
         if (requestId != null) {
             requestId2SessionMap.remove(requestId);

@@ -100,7 +100,7 @@ public class GoogleStreamRecognition {
                         .setStreamingConfig(streamingRecognitionConfig)
                         .build();
         // 发送音频元数据等信息
-        log.info(">>>>> SENDING CONFIG_DATA: {}", request);
+        log.info(">>>>> SENDING CONFIG_DATA: [{}]", request);
         clientStream.send(request);
     }
 
@@ -132,7 +132,7 @@ public class GoogleStreamRecognition {
                 StreamingRecognitionResult result = resultsList.get(0);
                 SpeechRecognitionAlternative alternative = result.getAlternativesList().get(0);
                 if (result.getIsFinal()) {
-                    log.info(">>>>> RESULT: {}", alternative.getTranscript());
+                    log.info(">>>>> RESULT: [{}]", alternative.getTranscript());
                 }
             }
         }

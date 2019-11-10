@@ -30,7 +30,7 @@ public class MicrosoftTranslation {
         String to = "zh-Hans";
         String text = "Welcome to Microsoft Translator. Guess how many languages I speak!";
         ResponseBody response = post(url, subscriptionKey, from, to, text);
-        log.info(">>>> RESULT: {}", response == null ? null : response.string());
+        log.info(">>>> RESULT: [{}]", response == null ? null : response.string());
     }
 
     private static ResponseBody post(String url, String subscriptionKey, String from, String to, String text) throws IOException {

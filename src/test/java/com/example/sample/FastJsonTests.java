@@ -16,17 +16,17 @@ public class FastJsonTests {
     @Test
     public void test() {
         JSONObject jsonObject = JSON.parseObject("{\"name\":\"zyh\"}");
-        log.info(">>>>> jsonObject: {}", jsonObject);
+        log.info(">>>>> jsonObject: [{}]", jsonObject);
         JSONArray jsonArray = JSON.parseArray("[{\"name\":\"zyh\"}, {\"name\":\"zys\"}]");
-        log.info(">>>>> jsonArray: {}", jsonArray);
+        log.info(">>>>> jsonArray: [{}]", jsonArray);
 
         Zhang zhang = JSON.parseObject("{\"name\":\"zyh\"}", Zhang.class);
-        log.info(">>>>> zhang: {}", zhang);
+        log.info(">>>>> zhang: [{}]", zhang);
         List<Zhang> zhangs = JSON.parseArray("[{\"name\":\"zyh\"}, {\"name\":\"zys\"}]", Zhang.class);
-        log.info(">>>>> zhangs: {}", zhangs);
+        log.info(">>>>> zhangs: [{}]", zhangs);
 
-        log.info(">>>>> object-jsonString: {}", JSON.toJSONString(zhang));
-        log.info(">>>>> list-jsonString: {}", JSON.toJSONString(zhangs));
+        log.info(">>>>> object-jsonString: [{}]", JSON.toJSONString(zhang));
+        log.info(">>>>> list-jsonString: [{}]", JSON.toJSONString(zhangs));
 
     }
 

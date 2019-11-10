@@ -92,11 +92,11 @@ public class NettyWebSocketClient implements Runnable {
                 this.notify();
             }
             channelInitialized = true;
-            log.info(">>>>> NETTY WEBSOCKET CLIENT START TO CONNECT SERVER, HOST: {}, PORT: {}", host, port);
+            log.info(">>>>> NETTY WEBSOCKET CLIENT START TO CONNECT SERVER, HOST: [{}], PORT: [{}]", host, port);
 
             handler.handshakeFuture().sync();
 
-            // // 线程要阻塞住，不然会退出
+            // 线程要阻塞住，不然会退出
             Thread.currentThread().join();
         } catch (Exception e) {
             ErrorPrintUtil.printErrorMsg(log, e);

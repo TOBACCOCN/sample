@@ -55,7 +55,8 @@ public class NettyHttpServer {
 
                             // 2.使用 netty 自带类创建自签名证书
                             SelfSignedCertificate certificate = new SelfSignedCertificate();
-                            SslHandler sslHandler = SslContextBuilder.forServer(certificate.certificate(), certificate.privateKey()).build().newHandler(channel.alloc());
+                            SslHandler sslHandler = SslContextBuilder.forServer(certificate.certificate(),
+                                    certificate.privateKey()).build().newHandler(channel.alloc());
 
                             ChannelPipeline pipeline = channel.pipeline();
                             pipeline.addLast(sslHandler);

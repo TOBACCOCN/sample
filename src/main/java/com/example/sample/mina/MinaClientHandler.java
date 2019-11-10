@@ -29,7 +29,7 @@ public class MinaClientHandler extends IoHandlerAdapter {
 
     @Override
     public void messageReceived(IoSession session, Object message) {
-        log.info(">>>>> RECEIVING MESSAGE: {}, SESSION_ID: {}", message, session.getId());
+        log.info(">>>>> RECEIVING MESSAGE: [{}], SESSION_ID: [{}]", message, session.getId());
     }
 
     @Override
