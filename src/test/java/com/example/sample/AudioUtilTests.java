@@ -7,7 +7,8 @@ public class AudioUtilTests {
 
     @Test
     public void pcm2Wav() throws Exception {
-        AudioUtil.pcm2Wav("D:\\git\\github\\sample\\output.pcm", "D:\\git\\github\\sample\\output.wav");
+        AudioUtil.pcm2Wav("C:\\Users\\Administrator\\Desktop\\1.pcm",
+                "C:\\Users\\Administrator\\Desktop\\1.wav");
     }
 
 }

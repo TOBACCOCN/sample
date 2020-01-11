@@ -1,77 +1,90 @@
 package com.example.sample.util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
 public class WavHeader {
 
-    private char fileID[] = {'R', 'I', 'F', 'F'};        // 4byte, 资源交换文件标识
-    private int fileLength;                                        // 4byte, 从下个地址开始到文件尾的总字节数
-    private char wavTag[] = {'W', 'A', 'V', 'E'};    // 4byte, WAV文件标识
-    private char fmtHdrID[] = {'f', 'm', 't', ' '};    // 4byte, 波形格式标识(fmt), 最后一位空格
-    private int fmtHdrLength = 16;                            // 4byte, PCMWAVEFORMAT的长度
-    private short formatTag = 1;                                // 2byte, 格式种类(值为1时, 表示数据为线性PCM编码)
-    private short channels;                                        // 2byte, 通道数, 单声道为1, 双声道为2
-    private int sampleRate;                                        // 4byte, 采样率, 比如44100
-    private int avgBytesPerSec;                                // 4byte, 波形数据传输速率(每秒平均字节数), 大小为 通道数 * 采样位数
-    private short blockAlign;                                    // 2byte, DATA数据块长度, 大小为 通道数 * 采样位数
-    private short bitsPerSample;                            // 2byte, 采样位数, 即PCM位宽, 通常为8位或16位
-    private char dataHdrID[] = {'d', 'a', 't', 'a'}; // 4byte, 数据标记符
-    private int dataHdrLength;                                // 4byte, 接下来声音数据的总大小
+    private byte[] header = new byte[44];
 
-    public WavHeader(int fileLength, short channels, int sampleRate, int avgBytesPerSec, short blockAlign, short bitsPerSample,
-                      int dataHdrLength) {
-        super();
-        this.fileLength = fileLength;
-        this.channels = channels;
-        this.sampleRate = sampleRate;
-        this.avgBytesPerSec = avgBytesPerSec;
-        this.blockAlign = blockAlign;
-        this.bitsPerSample = bitsPerSample;
-        this.dataHdrLength = dataHdrLength;
+    public WavHeader(int fileLength, short channels, int sampleRate, int avgBytesPerSec,
+                     short blockAlign, short bitsPerSample, int dataLength) {
+        // 4byte，资源交换文件标识
+        char[] fileId = {'R', 'I', 'F', 'F'};
+        header[0] = (byte) fileId[0];
+        header[1] = (byte) fileId[1];
+        header[2] = (byte) fileId[2];
+        header[3] = (byte) fileId[3];
+
+        // 4byte，从下个地址开始到文件尾的总字节数
+        header[4] = (byte) (fileLength & 0xff);
+        header[5] = (byte) (fileLength >> 8 & 0xff);
+        header[6] = (byte) (fileLength >> 16 & 0xff);
+        header[7] = (byte) (fileLength >> 24 & 0xff);
+
+        // 4byte，WAV 文件标识
+        char[] wavId = {'W', 'A', 'V', 'E'};
+        header[8] = (byte) wavId[0];
+        header[9] = (byte) wavId[1];
+        header[10] = (byte) wavId[2];
+        header[11] = (byte) wavId[3];
+
+        // 4byte，波形格式标识（fmt）, 最后一位空格
+        char[] fmtId = {'f', 'm', 't', ' '};
+        header[12] = (byte) fmtId[0];
+        header[13] = (byte) fmtId[1];
+        header[14] = (byte) fmtId[2];
+        header[15] = (byte) fmtId[3];
+
+        // 4byte，PCMWAVEFORMAT 的长度
+        int fmtLength = 16;
+        header[16] = (byte) (fmtLength & 0xff);
+        header[17] = (byte) (fmtLength >> 8 & 0xff);
+        header[18] = (byte) (fmtLength >> 16 & 0xff);
+        header[19] = (byte) (fmtLength >> 24 & 0xff);
+
+        // 2byte，格式种类（值为 1 时, 表示数据为线性 PCM 编码）
+        short format = 1;
+        header[20] = (byte) (format & 0xff);
+        header[21] = (byte) (format >> 8 & 0xff);
+
+        // 2byte，通道数, 单声道为 1, 双声道为 2
+        header[22] = (byte) (channels & 0xff);
+        header[23] = (byte) (channels >> 8 & 0xff);
+
+        // 4byte，采样率, 比如 8000，16000，44100
+        header[24] = (byte) (sampleRate & 0xff);
+        header[25] = (byte) (sampleRate >> 8 & 0xff);
+        header[26] = (byte) (sampleRate >> 16 & 0xff);
+        header[27] = (byte) (sampleRate >> 24 & 0xff);
+
+        // 4byte，波形数据传输速率（每秒平均字节数）， 大小为：通道数 * 采样率 * 采样位数 / 8
+        header[28] = (byte) (avgBytesPerSec & 0xff);
+        header[29] = (byte) (avgBytesPerSec >> 8 & 0xff);
+        header[30] = (byte) (avgBytesPerSec >> 16 & 0xff);
+        header[31] = (byte) (avgBytesPerSec >> 24 & 0xff);
+
+        // 2byte，DATA 数据块长度，大小为通道数 * 采样字节数
+        header[32] = (byte) (blockAlign & 0xff);
+        header[33] = (byte) (blockAlign >> 8 & 0xff);
+
+        // 2byte，采样位数, 即 PCM 位宽，通常为 8 位或 16位
+        header[34] = (byte) (bitsPerSample & 0xff);
+        header[35] = (byte) (bitsPerSample >> 8 & 0xff);
+
+        // 4byte，数据标记符
+        char[] dataId = {'d', 'a', 't', 'a'};
+        header[36] = (byte) dataId[0];
+        header[37] = (byte) dataId[1];
+        header[38] = (byte) dataId[2];
+        header[39] = (byte) dataId[3];
+
+        // 4byte，接下来声音数据的总大小
+        header[40] = (byte) (dataLength & 0xff);
+        header[41] = (byte) (dataLength >> 8 & 0xff);
+        header[42] = (byte) (dataLength >> 16 & 0xff);
+        header[43] = (byte) (dataLength >> 24 & 0xff);
     }
 
-    public byte[] getHeader() throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        WriteChar(baos, fileID);
-        WriteInt(baos, fileLength);
-        WriteChar(baos, wavTag);
-        WriteChar(baos, fmtHdrID);
-        WriteInt(baos, fmtHdrLength);
-        WriteShort(baos, formatTag);
-        WriteShort(baos, channels);
-        WriteInt(baos, sampleRate);
-        WriteInt(baos, avgBytesPerSec);
-        WriteShort(baos, blockAlign);
-        WriteShort(baos, bitsPerSample);
-        WriteChar(baos, dataHdrID);
-        WriteInt(baos, dataHdrLength);
-        baos.flush();
-        byte[] bytes = baos.toByteArray();
-        baos.close();
-        return bytes;
-    }
-
-    private void WriteShort(ByteArrayOutputStream baos, int s) throws IOException {
-        byte[] bytes = new byte[2];
-        bytes[1] = (byte) ((s << 16) >> 24);
-        bytes[0] = (byte) ((s << 24) >> 24);
-        baos.write(bytes);
-    }
-
-    private void WriteInt(ByteArrayOutputStream baos, int i) throws IOException {
-        byte[] buf = new byte[4];
-        buf[3] = (byte) (i >> 24);
-        buf[2] = (byte) ((i << 8) >> 24);
-        buf[1] = (byte) ((i << 16) >> 24);
-        buf[0] = (byte) ((i << 24) >> 24);
-        baos.write(buf);
-    }
-
-    private void WriteChar(ByteArrayOutputStream baos, char[] chars) {
-        for (char c : chars) {
-            baos.write(c);
-        }
+    public byte[] getBytes() {
+        return header;
     }
 
 }

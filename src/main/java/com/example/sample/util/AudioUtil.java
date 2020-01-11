@@ -1,9 +1,8 @@
 package com.example.sample.util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.*;
 import java.util.Arrays;
 
 /**
@@ -12,6 +11,7 @@ import java.util.Arrays;
  * @author zhangyonghong
  * @date 2019.6.14
  */
+@Slf4j
 public class AudioUtil {
 
     /**
@@ -55,42 +55,35 @@ public class AudioUtil {
      * @param wavPath wav 音频文件路径
      */
     public static void pcm2Wav(String pcmPath, String wavPath) throws Exception {
-        FileInputStream fis = new FileInputStream(pcmPath);
-        FileOutputStream fos = new FileOutputStream(wavPath);
+        File pcmFile = new File(pcmPath);
+        int dataLength = (int) pcmFile.length();
 
-        byte[] buf = new byte[1024 * 8];
-        int length = fis.read(buf);
-        int pcmLength = 0;
-        while (length != -1) {
-            pcmLength += length;
-            length = fis.read(buf);
-        }
-        fis.close();
-
-        int fileLength = pcmLength + (44 - 8);
+        int fileLength = dataLength + (44 - 8);
         short channels = 1;
         // short channels = 2;
-        short bitsPerSample = 16;
-        short blockAlign = (short) (channels * bitsPerSample);
         // int sampleRate = 8000;
         int sampleRate = 16000;
         // int sampleRate = 24000;
         // int sampleRate = 44100;
+        short bitsPerSample = 16;
+        short blockAlign = (short) (channels * bitsPerSample / 8);
         int avgBytesPerSec = blockAlign * sampleRate;
-        int dataHdrLength = pcmLength;
-        WavHeader header = new WavHeader(fileLength, channels, sampleRate, avgBytesPerSec, blockAlign, bitsPerSample, dataHdrLength);
+        WavHeader header = new WavHeader(fileLength, channels, sampleRate, avgBytesPerSec,
+                blockAlign, bitsPerSample, dataLength);
 
-        byte[] headerBytes = header.getHeader();
-        assert headerBytes.length == 44;
+        byte[] headerBytes = header.getBytes();
+        FileOutputStream fos = new FileOutputStream(wavPath);
         fos.write(headerBytes, 0, headerBytes.length);
-        fis = new FileInputStream(pcmPath);
-        length = fis.read(buf);
-        while (length != -1) {
+        FileInputStream fis = new FileInputStream(pcmFile);
+        byte[] buf = new byte[1024 * 8];
+        int length;
+        while ((length = fis.read(buf)) != -1) {
             fos.write(buf, 0, length);
-            length = fis.read(buf);
         }
         fis.close();
         fos.close();
+
+        log.debug(">>>>> PCM_2_WAV_DONE");
     }
 
 }

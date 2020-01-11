@@ -31,6 +31,7 @@ public class AliyunSmsTests {
         request.putQueryParameter("TemplateParam", "{\"code\":\"1111\"}");
         CommonResponse response = client.getCommonResponse(request);
         log.debug(">>>>> RESULT: [{}]", response.getData());
+        // {"Message":"OK","RequestId":"EDAC1CBF-A625-4F61-A8E9-C2935B81BAC3","BizId":"782619176396333347^0","Code":"OK"}
     }
 
 }
