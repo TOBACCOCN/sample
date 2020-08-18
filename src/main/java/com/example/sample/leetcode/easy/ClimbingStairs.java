@@ -37,7 +37,7 @@ public class ClimbingStairs {
     }
 
     @Test
-    public void climbigStairs() {
+    public void climbingStairs() {
         int n = 6;
         log.info(">>>>> RESULT: [{}]", climbingStairs(n));
     }

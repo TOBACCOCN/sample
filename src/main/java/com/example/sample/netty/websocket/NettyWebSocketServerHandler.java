@@ -135,12 +135,15 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Obj
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        // 客户端异常断开、channel.close()，以及服务端 channel.close() 都会触发 channelInActive
+        // 客户端空闲也会触发 channelInActive，尤其要注意客户端通过 nginx 长连接到服务端时，nginx 对长连接的保活时长，好像是默认 60 秒
         super.channelInactive(ctx);
         WebsocketChannelManager.unregisterChannel(ctx.channel());
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        // 客户端异常断开、channel.close() 都会触发 exceptionCaught()
         if (cause instanceof IOException) {
             log.info(">>>>> CLIENT CLOSED");
         } else {
@@ -150,7 +153,6 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Obj
         Channel channel = ctx.channel();
         if (channel != null) {
             WebsocketChannelManager.unregisterChannel(channel);
-            channel.close();
         }
     }
 

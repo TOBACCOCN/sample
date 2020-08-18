@@ -12,8 +12,8 @@ public class KeyExpiredListenerTests {
 
     @Test
     public void test() {
-        Jedis jedis = new Jedis("192.168.1.128", 6379);
-        jedis.auth("water@abc123");
+        Jedis jedis = new Jedis("127.0.0.1", 6379);
+        jedis.auth("test");
         jedis.psubscribe(new KeyExpiredListener(), "__keyevent@0__:expired");
         jedis.close();
     }
