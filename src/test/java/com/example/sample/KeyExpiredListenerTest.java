@@ -6,7 +6,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
 @Slf4j
-public class KeyExpiredListenerTests {
+public class KeyExpiredListenerTest {
 
     // private static Logger logger = LoggerFactory.getLogger(KeyExpiredListenerTests.class);
 

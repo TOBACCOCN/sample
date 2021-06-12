@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Slf4j
-public class RedisClusterTests {
+public class RedisClusterTest {
 
     // private static Logger logger = LoggerFactory.getLogger(RedisClusterTests.class);
 

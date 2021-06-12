@@ -7,7 +7,7 @@ import org.junit.Test;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-public class ThreadJoinTests {
+public class ThreadJoinTest {
 
     @Test
     public void join() throws InterruptedException {

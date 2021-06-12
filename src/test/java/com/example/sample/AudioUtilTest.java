@@ -3,7 +3,7 @@ package com.example.sample;
 import com.example.sample.util.AudioUtil;
 import org.junit.Test;
 
-public class AudioUtilTests {
+public class AudioUtilTest {
 
     @Test
     public void pcm2Wav() throws Exception {

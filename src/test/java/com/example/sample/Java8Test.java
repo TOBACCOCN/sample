@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class Java8Tests {
+public class Java8Test {
 
     // private static Logger logger = LoggerFactory.getLogger(Java8Tests.class);
 

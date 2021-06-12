@@ -6,7 +6,7 @@ import org.junit.Test;
 import java.nio.ByteBuffer;
 
 @Slf4j
-public class ByteBufferTests {
+public class ByteBufferTest {
     
     // private static Logger logger = LoggerFactory.getLogger(ByteBufferTests.class);
 

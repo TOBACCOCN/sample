@@ -9,7 +9,7 @@ import org.junit.Test;
 import java.util.List;
 
 @Slf4j
-public class FastJsonTests {
+public class FastJsonTest {
 
     // private static Logger logger = LoggerFactory.getLogger(FastJsonTests.class);
 

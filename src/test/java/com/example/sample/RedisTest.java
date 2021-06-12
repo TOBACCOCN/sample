@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 @Slf4j
-public class RedisTests {
+public class RedisTest {
 
     // private static Logger logger = LoggerFactory.getLogger(RedisTests.class);
 

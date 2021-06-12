@@ -26,7 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
-public class AliyunImageSearchTests {
+public class AliyunImageSearchTest {
 
     private Charset charset = StandardCharsets.UTF_8;
     // fill your instanceName

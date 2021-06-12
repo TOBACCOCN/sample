@@ -6,7 +6,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import redis.clients.jedis.JedisCluster;
 
 @Slf4j
-public class ApplicationContextTests {
+public class ApplicationContextTest {
 
 	// private static Logger logger = LoggerFactory.getLogger(ApplicationContextTests.class);
 
