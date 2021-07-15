@@ -12,7 +12,7 @@ public class SimpleStream {
         Objects.requireNonNull(action);
 
         int index = 0;
-        for (Map.Entry entry: map.entrySet()) {
+        for (Map.Entry entry : map.entrySet()) {
             action.accept(index++, entry);
         }
     }
