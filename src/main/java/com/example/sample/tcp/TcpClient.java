@@ -11,7 +11,7 @@ import java.util.Scanner;
 @Slf4j
 public class TcpClient {
 
-    // private static Logger logger = LoggerFactory.getLogger(SocketClient.class);
+    // private static Logger logger = LoggerFactory.getLogger(TcpClient.class);
 
     private static Socket connectServer(String host, int port) throws IOException {
         Socket socket = new Socket(host, port);
@@ -20,10 +20,11 @@ public class TcpClient {
         new Thread(() -> {
             while (!socket.isClosed()) {
                 try {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    String message = reader.readLine();
-                    if (message != null) {
-                        log.info(">>>>> RECEIVE: [{}]", message);
+                    InputStream inputStream = socket.getInputStream();
+                    byte[] buf = new byte[8192];
+                    int len;
+                    while ((len = inputStream.read(buf)) > 0) {
+                        log.info(">>>>> RECEIVE: [{}]", new String(buf, 0, len));
                     }
                 } catch (Exception e) {
                     ErrorPrintUtil.printErrorMsg(log, e);
@@ -36,7 +37,6 @@ public class TcpClient {
     public static void sendMessage(Socket socket, String message) throws IOException {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         writer.write(message);
-        writer.newLine();
         writer.flush();
     }
 

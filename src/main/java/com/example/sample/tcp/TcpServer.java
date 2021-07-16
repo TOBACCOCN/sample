@@ -11,7 +11,7 @@ import java.util.UUID;
 @Slf4j
 public class TcpServer {
 
-    // private static Logger logger = LoggerFactory.getLogger(SocketServer.class);
+    // private static Logger logger = LoggerFactory.getLogger(TcpServer.class);
 
     private static void startServer(int port) {
         new Thread(() -> {
@@ -24,18 +24,17 @@ public class TcpServer {
                     int remotePort = socket.getPort();
                     log.info(">>>>> CLIENT INCOME, IP: [{}], PORT: [{}]", remoteIP, remotePort);
 
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    InputStream inputStream = socket.getInputStream();
+                    byte[] buf = new byte[8192];
+                    int len;
                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-                    String msg;
-                    while ((msg = reader.readLine()) != null) {
-                        log.info(">>>>> RECEIVE: [{}]", msg);
+                    while ((len = inputStream.read(buf)) > 0) {
+                        log.info(">>>>> RECEIVE: [{}]", new String(buf, 0, len));
                         String response = "Hello, I'm TCP Server, timestamp: " + System.currentTimeMillis();
                         log.info(">>>>> SEND: [{}]", response);
                         writer.write(response);
-                        writer.newLine();
                         writer.flush();
                     }
-                    reader.close();
                     writer.close();
                 }
             } catch (IOException e) {
