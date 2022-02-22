@@ -1,5 +1,6 @@
 # ignore idea file
 .idea/
+*.iml
 
 # ignore eclipse file
 .settings/
