@@ -1,9 +1,12 @@
-package com.example.sample.base;
+package com.example.sample.util;
 
 import com.alibaba.excel.EasyExcelFactory;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.metadata.BaseRowModel;
 import com.alibaba.excel.metadata.Sheet;
+import com.example.sample.base.OrderModel;
+import com.example.sample.base.SimpleStream;
+import com.example.sample.base.UserModel;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;

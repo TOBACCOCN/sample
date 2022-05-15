@@ -33,7 +33,7 @@ public class LRUCache {
     public EntryNode get(Object key) {
         EntryNode entryNode = map.get(key);
         if (entryNode != null) {
-            removeToHead(entryNode);
+            moveToHead(entryNode);
         }
         return entryNode;
     }
@@ -43,7 +43,7 @@ public class LRUCache {
      *
      * @param entryNode 键值对节点
      */
-    private void removeToHead(EntryNode entryNode) {
+    private void moveToHead(EntryNode entryNode) {
         // 该键值对节点本来就在链表最前面
         if (entryNode == head) {
             return;
@@ -96,7 +96,7 @@ public class LRUCache {
 
         // 将缓存（键值对节点）存到 map，键值对节点挪到链表最前面
         map.put(key, entryNode);
-        removeToHead(entryNode);
+        moveToHead(entryNode);
 
         // 第一次放缓存时，链表头部和尾部节点是同一个节点
         if (tail == null) {

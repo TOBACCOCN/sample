@@ -32,6 +32,7 @@ public class ThreadPoolExecutorTest {
 
     @Test
     public void execute() throws InterruptedException {
+        // 最多任务数为 maximumPoolSize + workQueue.capacity
         int corePoolSize = 1;
         int maximumPoolSize = 2;
         long keepAliveTime = 0;
