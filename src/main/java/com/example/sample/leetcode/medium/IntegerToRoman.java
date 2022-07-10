@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.Scanner;
 
 /**
  * Roman numerals are represented by seven different symbols: I, V, X, L, C, D and M.
@@ -86,6 +87,50 @@ public class IntegerToRoman {
     public void integer2Roman() {
         int num = 3494;
         log.info(">>>>> ROMAN: [{}]", integer2Roman(num));
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        String line = sc.nextLine();
+        sc.close();
+
+        int index = line.indexOf('2');
+        if (line.contains("2")&& (line.charAt(index + 1) < '0' || line.charAt(index + 1) > '9' || index > 0 && (line.charAt(index - 1) > '9' ||  line.charAt(index - 1) < '1'))) {
+            System.out.println("!error");
+            return;
+        }
+
+        StringBuffer buffer = new StringBuffer();
+        int count = 0;
+        boolean numFlag = false;
+        for (int i = 0; i < line.length(); ++i) {
+            char c = line.charAt(i);
+            if (c >= '1' && c <= '9') {
+                if (numFlag) {
+                    count = count * 10 + Integer.parseInt(String.valueOf(c));
+                } else {
+                    count = Integer.parseInt(String.valueOf(c));
+                }
+                numFlag = true;
+                continue;
+            }
+
+            if (c >= 'a' && c <= 'z') {
+                if (count == 0) {
+                    buffer.append(c);
+                } else {
+                    for (int j = 0; j < count; ++j) {
+                        buffer.append(c);
+                    }
+                    numFlag = false;
+                    count = 0;
+                }
+                continue;
+            }
+            System.out.println("!error");
+            return;
+        }
+        System.out.println(buffer);
     }
 
 }

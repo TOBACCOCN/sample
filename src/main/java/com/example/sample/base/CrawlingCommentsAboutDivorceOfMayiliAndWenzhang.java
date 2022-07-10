@@ -32,7 +32,7 @@ public class CrawlingCommentsAboutDivorceOfMayiliAndWenzhang {
         for (int i = 1; i <= pages; i++) {
             log.info(">>>>> PAGE: [{}]", i);
             String url = "https://weibo.com/aj/v6/comment/big?ajwvr=6&id=4399042567665659&page=" + i;
-            String result = HttpURLConnectionUtil.httpGet(url, headerMap);
+            String result = HttpURLConnectionUtil.httpGet(url, headerMap, null);
             JSONObject jsonObject = JSONObject.parseObject(result);
             String html = jsonObject.getJSONObject("data").getString("html");
             log.info(">>>>> HTML: [{}]", html);

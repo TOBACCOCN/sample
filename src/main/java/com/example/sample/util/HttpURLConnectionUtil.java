@@ -56,7 +56,7 @@ public class HttpURLConnectionUtil {
         // connection.connect();
         int responseCode = connection.getResponseCode();
         log.info(">>>>> RESPONSE_CODE: [{}]", responseCode);
-        if (responseCode != HttpURLConnection.HTTP_OK) {
+        if (responseCode >= HttpURLConnection.HTTP_BAD_REQUEST) {
             log.info(">>>>> RESPONSE_MESSAGE: [{}]", connection.getResponseMessage());
             return "";
         } else {
@@ -67,6 +67,11 @@ public class HttpURLConnectionUtil {
             byte[] buf = new byte[1024];
             while ((len = inputStream.read(buf)) != -1) {
                 baos.write(buf, 0, len);
+            }
+            Map<String, List<String>> headerFields = connection.getHeaderFields();
+            for (Map.Entry<String, List<String>> entry : headerFields.entrySet()) {
+                List<String> value = entry.getValue();
+                log.info(">>>>> value: [{}]", value);
             }
             connection.disconnect();
             return new String(baos.toByteArray(), StandardCharsets.UTF_8);
@@ -95,11 +100,14 @@ public class HttpURLConnectionUtil {
      * @param url 请求地址
      * @return 响应消息
      */
-    public static String httpGet(String url, Map<String, String> headerMap) throws Exception {
+    public static String httpGet(String url, Map<String, String> headerMap, String cookie) throws Exception {
         HttpURLConnection connection = getConnection(url);
         connection.setRequestMethod("GET");
         if (headerMap != null) {
             headerMap.forEach(connection::addRequestProperty);
+        }
+        if(cookie != null) {
+            connection.setRequestProperty("Cookie", cookie);
         }
         return getResponse(connection);
     }
@@ -121,7 +129,9 @@ public class HttpURLConnectionUtil {
             headerMap.forEach(connection::addRequestProperty);
         }
         OutputStream outputStream = connection.getOutputStream();
-        outputStream.write(param.getBytes());
+        if (param != null) {
+            outputStream.write(param.getBytes());
+        }
         return getResponse(connection);
     }
 

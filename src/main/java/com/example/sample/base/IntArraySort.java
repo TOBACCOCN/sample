@@ -82,7 +82,7 @@ public class IntArraySort {
     private static void quickSort0(int[] array, int left, int right) {
         if (left < right) {
             int pivot = partition(array, left, right);
-            quickSort0(array, left, pivot);
+            quickSort0(array, left, pivot - 1);
             quickSort0(array, pivot + 1, right);
         }
     }

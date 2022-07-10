@@ -268,7 +268,7 @@ public class ObjectArraySort {
     private static <T> void quickSort0(T[] array, int left, int right, Comparator<T> comparator) {
         if (left < right) {
             int pivot = partition(array, left, right, comparator);
-            quickSort0(array, left, pivot, comparator);
+            quickSort0(array, left, pivot - 1, comparator);
             quickSort0(array, pivot + 1, right, comparator);
         }
     }

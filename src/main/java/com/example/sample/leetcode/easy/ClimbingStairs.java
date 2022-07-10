@@ -28,7 +28,10 @@ import org.junit.Test;
 public class ClimbingStairs {
 
     public int climbingStairs(int n) {
-        int a = 1, b = 1;
+        if (n < 2) {
+            return n;
+        }
+        int a = 0, b = 1;
         while (--n > 0) {
             b += a;
             a = b - a;

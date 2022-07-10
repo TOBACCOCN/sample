@@ -3,8 +3,10 @@ package com.example.sample;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
+import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import java.io.*;
 import java.time.Clock;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -64,6 +66,30 @@ public class Java8Test {
         // 可以运行js代码的引擎
         log.info(">>>>> JAVA_SCRIPT: [{}]",
                 new ScriptEngineManager().getEngineByName("JavaScript").eval("function f() {return 10;}f()*10;"));
+    }
+
+
+    @Test
+    public void test01() throws IOException, ScriptException {
+        ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
+        //使用管道流，将输出流转为输入流
+        PipedReader prd = new PipedReader();
+        PipedWriter pwt = new PipedWriter(prd);
+//设置执行结果内容的输出流
+        engine.getContext().setWriter(pwt);
+//js文件的路径
+        String strFile =  "C:\\Users\\TOBACCO\\Desktop\\javascript\\dCCTc.js";
+        Reader reader = new FileReader(strFile);
+        engine.eval(reader);
+        BufferedReader br = new BufferedReader(prd);
+//开始读执行结果数据
+        String str ;
+        while ((str = br.readLine()) != null && str.length() > 0) {
+            System.out.println(str);
+        }
+        br.close();
+        pwt.close();
+        prd.close();
     }
 
 }
