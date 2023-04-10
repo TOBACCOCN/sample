@@ -28,10 +28,28 @@ public class EasyExcelUtil {
         ExcelWriter writer = EasyExcelFactory.getWriter(outputStream);
         SimpleStream.forEach(map, (index, entry) -> {
             Type type = ((ParameterizedType) entry.getValue().getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-            Sheet sheet = new Sheet(index + 1, 0, (Class) type);
+            Sheet sheet = new Sheet(index, 0, (Class) type);
             sheet.setSheetName((String) entry.getKey());
             writer.write((List) entry.getValue(), sheet);
         });
+        //
+        // int i = 0;
+        // for (Map.Entry<String, List<? extends BaseRowModel>> entry : map.entrySet()) {
+        //     String key = entry.getKey();
+        //     List<? extends BaseRowModel> value = entry.getValue();
+        //     Sheet sheet = new Sheet(++i, 0, (Class<? extends BaseRowModel>) ((ParameterizedType) entry.getValue().getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
+        //     sheet.setSheetName(key);
+        //     writer.write(value, sheet);
+        // }
+
+        final int[] x = {0};
+        map.forEach((key, value) -> {
+            int a = ++x[0];
+            Sheet sheet = new Sheet(a, 0, (Class<? extends BaseRowModel>) ((ParameterizedType) value.getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
+            sheet.setSheetName(key);
+            writer.write(value, sheet);
+        });
+
         writer.finish();
         outputStream.close();
     }

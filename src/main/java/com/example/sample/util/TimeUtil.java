@@ -3,13 +3,15 @@ package com.example.sample.util;
 import lombok.extern.slf4j.Slf4j;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
 /**
- * UTC 时间工具类
+ * 时间工具类
  *
  * @author zhangyonghong
  * @date 2018.3.29
@@ -17,66 +19,108 @@ import java.util.TimeZone;
 @Slf4j
 public final class TimeUtil {
 
-    // private static Logger logger = LoggerFactory.getLogger(TimeUtil.class);
-
     /**
-     * yyyyMMdd'T'HHmmss'Z'格式时间转日期Date
+     * Date 转 LocalDateTime
      *
-     * @return
+     * @param date: Date 对象
+     * @return java.time.LocalDateTime
      */
-    public static String date2TzTime(Date date) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
-        return format.format(date);
+    public static LocalDateTime date2LocalDateTime(Date date) {
+        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 
     /**
-     * yyyyMMdd'T'HHmmss'Z'格式时间转日期Date
+     * LocalDateTime 转 Date
+     *
+     * @param localDateTime: LocalDateTime 对象
+     * @return java.util.Date
      */
-    public static Date tzTime2Date(String tzTime) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
+    public static Date localDateTime2Date(LocalDateTime localDateTime) {
+        ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.systemDefault());
+        return Date.from(zonedDateTime.toInstant());
+    }
+
+    /**
+     * 格式化 LocalDateTime
+     *
+     * @param localDateTime LocalDateTime
+     * @param pattern the pattern
+     * @return the formatted string of LocalDateTime
+     */
+    public static String format(LocalDateTime localDateTime, String pattern) throws Exception {
         try {
-            return format.parse(tzTime);
-        } catch (ParseException e) {
-            return null;
+            return DateTimeFormatter.ofPattern(pattern).format(localDateTime);
+        } catch (Exception e) {
+            throw new Exception(String.format("[%s] is not valid pattern", pattern));
         }
     }
 
     /**
-     * yyyyMMdd'T'HHmmss'Z'格式时间转yyyy-MM-dd HH:mm:ss格式
+     * 获取 UTC 时间
+     *
+     * @return java.util.Date
      */
-    public static String tzTime2Pretty(String tzTime) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
-        SimpleDateFormat prettyFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        try {
-            return prettyFormat.format(format.parse(tzTime));
-        } catch (ParseException e) {
-            return "";
-        }
-    }
-
-    /**
-     * 将UTC时间按经度转换到时间
-     */
-    public static String utc2Other(String utcTime, int longitude) {
-        int zoneOffset = getZoneOffset(longitude);
+    public static Date getUtcTime() {
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
-        SimpleDateFormat prettyFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        try {
-            calendar.setTime(format.parse(utcTime));
-            calendar.add(Calendar.HOUR, zoneOffset);
-            return prettyFormat.format(calendar.getTime());
-        } catch (ParseException e) {
-            log.info(e.getMessage());
-            return "";
-        }
+        int zoneOffset = calendar.get(Calendar.ZONE_OFFSET);
+        int dstOffset = calendar.get(Calendar.DST_OFFSET);
+        calendar.add(Calendar.MILLISECOND, -(zoneOffset + dstOffset));
+        return calendar.getTime();
+        // return Date.from(Clock.systemUTC().instant());
     }
 
     /**
-     * 根据经度查询与UTC时区间隔时区数
+     * 将本地时区时间转换为 UTC 时间
+     *
+     * @param date: 本地时间
+     * @return java.util.Date
      */
-    public static int getZoneOffset(int longitude) {
-        int zone = longitude / 15;
+    public static Date local2Utc(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int zoneOffset = calendar.get(Calendar.ZONE_OFFSET);
+        int dstOffset = calendar.get(Calendar.DST_OFFSET);
+        calendar.add(Calendar.MILLISECOND, -(zoneOffset + dstOffset));
+        return calendar.getTime();
+    }
+
+    /**
+     * 将 UTC 时间转换为本地时区时间
+     *
+     * @param utcDate: UTC 时间
+     * @return java.util.Date
+     */
+    public static Date utc2Local(Date utcDate) throws ParseException {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(utcDate);
+        int zoneOffset = calendar.get(Calendar.ZONE_OFFSET);
+        int dstOffset = calendar.get(Calendar.DST_OFFSET);
+        calendar.add(Calendar.MILLISECOND, zoneOffset + dstOffset);
+        return calendar.getTime();
+    }
+
+    /**
+     * 将 UTC 时间按经度转换到对应时区时间
+     *
+     * @param utcDate: UTC 时间
+     * @param longitude: 经度（东经为正，西经为负）
+     * @return java.util.Date
+     */
+    public static Date utc2Other(Date utcDate, int longitude) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(utcDate);
+        calendar.add(Calendar.HOUR, getZoneOffset(longitude));
+        return calendar.getTime();
+    }
+
+    /**
+     * 根据经度查询与 UTC 时区间隔时区数
+     *
+     * @param longitude: 经度
+     * @return int
+     */
+    public static int getZoneOffset(double longitude) {
+        int zone = (int) (Math.round(longitude) / 15);
         boolean plus = longitude * 2 % 30 > 15;
         boolean minus = longitude * 2 % 30 < -15;
         if (plus) {
@@ -85,47 +129,6 @@ public final class TimeUtil {
             zone -= 1;
         }
         return zone;
-    }
-
-    /**
-     * 获取UTC时间
-     */
-    public static String getUtcTime() {
-        String localTime = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'").format(new Date());
-        try {
-            return local2Utc(localTime);
-        } catch (ParseException e) {
-            return "";
-        }
-    }
-
-    /**
-     * 将本地时区时间转换为UTC时间
-     */
-    public static String local2Utc(String localTime) throws ParseException {
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
-        format.setTimeZone(TimeZone.getDefault());
-        Date localDate = format.parse(localTime);
-        format.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return format.format(localDate);
-    }
-
-    /**
-     * 将UTC时间转换为本地时区时间
-     */
-    public static String utc2Local(String utcTime) throws ParseException {
-        SimpleDateFormat utcFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
-        utcFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Date utcDate = utcFormat.parse(utcTime);
-        SimpleDateFormat localFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
-        localFormat.setTimeZone(TimeZone.getDefault());
-        return localFormat.format(utcDate);
-    }
-
-
-    public static void main(String[] args) throws ParseException {
-        System.out.println(local2Utc("20180329T203728Z"));
-        System.out.println(utc2Local("20180329T203728Z"));
     }
 
 }

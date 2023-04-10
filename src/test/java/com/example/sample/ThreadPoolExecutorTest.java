@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.util.concurrent.*;
 
+// https://segmentfault.com/a/1190000041151766
 @Slf4j
 public class ThreadPoolExecutorTest {
 

@@ -1,11 +1,13 @@
 package com.example.sample;
 
-import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
-import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
@@ -13,81 +15,8 @@ import java.util.regex.Pattern;
 public class BaseTest {
 
     @Test
-    public void test01() {
-        User user = new User("admin", "super", "超级管理员");
-        String json = JSON.toJSONString(user);
-        log.info(">>>>> json: [{}]", json);
-
-
-        User[][] array = new User[2][3];
-        for (User[] a : array) {
-            System.out.println(a);
-            for (User i : a) {
-                System.out.println(i);
-            }
-        }
-    }
-
-    @Test
-    public void test02() throws IOException, ClassNotFoundException {
-        User user = new User("admin", "super", "超级管理员");
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ObjectOutputStream os = new ObjectOutputStream(byteArrayOutputStream);
-        os.writeObject(user);
-        os.flush();
-        os.close();
-        ObjectInputStream is = new ObjectInputStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
-        user = (User) is.readObject();
-        is.close();
-        log.info(">>>>> s: [{}]", user);
-    }
-
-
-    @Test
-    public void test03() {
-        // HashSet<String> set = new LinkedHashSet<>();     // 存取顺序一致：遍历时，按存入的顺序取出
-        HashSet<String> set = new HashSet<>();
-        set.add("a");
-        set.add("a");
-        set.add("b");
-        set.add("c");
-        set.add("c");
-        set.add("b");
-        set.add("e");
-        set.add("d");
-        for (String s : set) {
-            log.info(">>>> s: [{}]", s);
-        }
-    }
-
-    private int sum;
-    private AtomicInteger s = new AtomicInteger();
-    private volatile int v;
-
-    @Test
-    public void test04() throws InterruptedException {
-        for (int i = 1; i <= 100; i = i + 10) {
-            MyThread myThread = new MyThread(i);
-            myThread.start();
-        }
-        // log.info(">>>>> SUM: [{}]", sum);
-        // log.info(">>>>> S: [{}]", s);
-
-        while (Thread.activeCount() > 1) {
-            Thread.yield();
-        }
-        log.info(">>>>> V: [{}]", v);
-
-        int n = 0;
-        for (int i = 1; i <= 100; ++i) {
-            n += i;
-        }
-        log.info(">>>>> N: [{}]", n);
-    }
-
-    @Test
-    public void test05() {
-        int n = 1000000000;
+    public void timeComplexity() {
+        int n = 100000;
         long count = 0;
         long start = System.currentTimeMillis();
         // O(n^2)
@@ -114,22 +43,6 @@ public class BaseTest {
         }
         log.info(">>>>> COUNT: [{}], COST: [{}]MS", count, System.currentTimeMillis() - start);
     }
-
-    @Test
-    public void test06() {
-        Scanner scanner = new Scanner(System.in);
-        int size = scanner.nextInt();
-        int[] array = new int[size];
-        for (int i = 0; i < size; ++i) {
-            array[i] = scanner.nextInt();
-        }
-        quickSort(array);
-        for (int j : array) {
-            System.out.println(j);
-        }
-    }
-
-    private static final int SHOW_THRESHOLD = 4;
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
@@ -169,7 +82,6 @@ public class BaseTest {
             if (i == result.length - 1) {
                 System.out.println();
             }
-
         }
     }
 
@@ -213,65 +125,6 @@ public class BaseTest {
         }
         result[0] = "NONE";
     }
-
-    // public static void main(String[] args) {
-    //     Scanner sc = new Scanner(System.in);
-    //     int count = sc.nextInt();
-    //     sc.nextLine();
-    //     String line = sc.nextLine();
-    //     sc.close();
-    //
-    //     String[] array = line.split(" ");
-    //     int[] arrayInt = new int[array.length];
-    //     int sum = 0;
-    //     for (int i = 0; i < array.length; ++i) {
-    //         int num = Integer.parseInt(array[i]);
-    //         sum += num;
-    //         arrayInt[i] = num;
-    //     }
-    //
-    //     if ((sum & 1) == 1) {
-    //         System.out.println(false);
-    //         return;
-    //     }
-    //     sum /= 2;
-    //     long start = System.currentTimeMillis();
-    //     List<Integer> excludeIndexs = new ArrayList<>();
-    //     System.out.println(findSumFromArray(sum, arrayInt, excludeIndexs, false,
-    //             false));
-    //     System.out.println("cost: " +( System.currentTimeMillis() - start));
-    // }
-
-    private static boolean findSumFromArray(int sum, int[] array,
-                                            List<Integer> excludeIndexs, boolean includedThree, boolean includedFive) {
-        for (int i = 0; i < array.length; ++i) {
-            if (excludeIndexs.contains(i)) {
-                continue;
-            }
-
-            if (includedThree && array[i] != 0 && array[i] % 5 == 0) {
-                continue;
-            }
-
-            if (includedFive && array[i] != 0 && array[i] % 3 == 0) {
-                continue;
-            }
-
-            if (sum == array[i]) {
-                return true;
-            }
-            excludeIndexs.add(Integer.valueOf(i));
-            includedThree = !includedThree ? array[i] % 3 == 0 : includedThree;
-            includedFive = !includedFive ? array[i] % 5 == 0 : includedFive;
-
-            if (findSumFromArray(sum - array[i], array, excludeIndexs, includedThree, includedFive)) {
-                return true;
-            }
-            excludeIndexs.remove(Integer.valueOf(i));
-        }
-        return false;
-    }
-
 
     private static boolean solveSudokuHelper(char[][] board) {
         //「一个for循环遍历棋盘的行，一个for循环遍历棋盘的列，
@@ -330,171 +183,6 @@ public class BaseTest {
             }
         }
         return true;
-    }
-
-
-    // public static void main(String[] args) {
-    //     Scanner sc = new Scanner(System.in);
-    //     int[][] dp = new int[9][9];
-    //     List<int[]> list = new ArrayList<>();
-    //     for (int i  = 0; i < 9; ++i) {
-    //         String line = sc.nextLine();
-    //         String[] array = line.split(" ");
-    //         for (int j = 0; j < array.length; ++j) {
-    //             int num = Integer.parseInt(array[j]);
-    //             dp[i][j] = num;
-    //             if (num == 0) {
-    //                 list.add(new int[] {i, j});
-    //             }
-    //         }
-    //     }
-    //     sc.close();
-    //
-    //     Map<int[], List<Integer>> map = new HashMap<>();
-    //     Map<Integer, List<Integer>> excludeXMap = new HashMap<>();
-    //     Map<Integer, List<Integer>> excludeYMap = new HashMap<>();
-    //
-    //     // 遍历值为 0 的位置，并查找出该位置应该填写的值
-    //     while (list.size() > 0) {
-    //         Iterator<int[]> it = list.iterator();
-    //         int count = 0;
-    //         while (it.hasNext()) {
-    //             if (count == list.size() - 1 && excludeXMap.size() == 0 && excludeYMap.size() == 0) {
-    //                 for (int[] array : map.keySet()) {
-    //                     for (int[] a : map.keySet()) {
-    //                         if (a != array && array[0] == a[0]) {
-    //                             List<Integer> l1 = map.get(array);
-    //                             List<Integer> l2 = map.get(a);
-    //                             if (l1.size() == l2.size() && l1.size() == 2 && l1.containsAll(l2)) {
-    //                                 excludeXMap.put(array[0], l1);
-    //                             }
-    //                         }
-    //                         if (a != array && array[1] == a[1]) {
-    //                             List<Integer> l1 = map.get(array);
-    //                             List<Integer> l2 = map.get(a);
-    //                             if (l1.size() == l2.size() && l1.size() == 2 && l1.containsAll(l2)) {
-    //                                 excludeYMap.put(array[1], l1);
-    //                             }
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //
-    //             int[] array = it.next();
-    //             int x = array[0], y = array[1];
-    //             List<Integer> constList = initConstList();
-    //             if (excludeXMap.containsKey(x) && excludeXMap.get(x) != map.get(array)) {
-    //                 constList.removeAll(excludeXMap.get(x));
-    //             }
-    //             for (int i = 0; i < dp.length; ++i) {
-    //                 constList.remove(Integer.valueOf(dp[x][i]));
-    //             }
-    //             if (constList.size() == 1) {
-    //                 dp[x][y] = constList.get(0);
-    //                 it.remove();
-    //                 if (excludeXMap.containsKey(x)) {
-    //                     excludeXMap.remove(Integer.valueOf(x));
-    //                 }
-    //                 continue;
-    //             }
-    //
-    //             if (excludeYMap.containsKey(y) && excludeYMap.get(y) != map.get(array)) {
-    //                 constList.removeAll(excludeYMap.get(y));
-    //             }
-    //             for (int i = 0; i < dp.length; ++i) {
-    //                 constList.remove(Integer.valueOf(dp[i][y]));
-    //             }
-    //             if (constList.size() == 1) {
-    //                 dp[x][y] = constList.get(0);
-    //                 it.remove();
-    //                 if (excludeYMap.containsKey(y)) {
-    //                     excludeYMap.remove(Integer.valueOf(y));
-    //                 }
-    //                 continue;
-    //             }
-    //
-    //             int startRowIndex = x / 3 * 3;
-    //             int startColIndex = y / 3 * 3;
-    //             for (int i = startRowIndex; i < startRowIndex + 3; ++i) {
-    //                 for (int j = startColIndex; j < startColIndex + 3; ++j) {
-    //                     constList.remove(Integer.valueOf(dp[i][j]));
-    //                 }
-    //             }
-    //             if (constList.size() == 1) {
-    //                 dp[x][y] = constList.get(0);
-    //                 it.remove();
-    //                 continue;
-    //             }
-    //             map.put(array, constList);
-    //             count++;
-    //         }
-    //     }
-    //
-    //     for (int i = 0; i < dp.length; ++i) {
-    //         for (int j = 0;  j < dp[i].length; ++j) {
-    //             System.out.print(dp[i][j]);
-    //             if (j == dp[i].length - 1) {
-    //                 System.out.println();
-    //             } else {
-    //                 System.out.print(" ");
-    //             }
-    //         }
-    //     }
-    //
-    // }
-
-    private static List<Integer> initConstList() {
-        List<Integer> constList = new ArrayList<>();
-        constList.add(1);
-        constList.add(2);
-        constList.add(3);
-        constList.add(4);
-        constList.add(5);
-        constList.add(6);
-        constList.add(7);
-        constList.add(8);
-        constList.add(9);
-        return constList;
-    }
-
-
-    // public static void main(String[] args){
-    //     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    //     String str = null;
-    //     try {
-    //         while((str = br.readLine())!= null){
-    //             String[] strArr = str.split("\\/");
-    //             int a = Integer.parseInt(strArr[0]);
-    //             int b = Integer.parseInt(strArr[1]);
-    //             String[] resArr = new String[1];
-    //             f(a, b, "", resArr);
-    //             System.out.println(resArr[0]);
-    //         }
-    //     } catch (NumberFormatException e) {
-    //         e.printStackTrace();
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //     }
-    // }
-
-
-    public static void f(int a, int b, String resStr, String[] resArr) {
-        if (a == 1 || b % a == 0) {
-            int val = b / a;
-            resStr += 1 + "/" + val;
-            resArr[0] = resStr;
-            return;
-        } else {
-            int q1 = b / a;
-            int r1 = b % a;
-            int val1 = q1 + 1;
-            resStr += 1 + "/" + val1 + "+";
-
-            a = a - r1;
-            b = b * (q1 + 1);
-            f(a, b, resStr, resArr);
-        }
-        return;
     }
 
     // public static void main(String[] args) {
@@ -560,9 +248,7 @@ public class BaseTest {
     // }
 
     // public static void main(String[] args) {
-    //
     //     Scanner scanner = new Scanner(System.in);
-    //
     //     while (scanner.hasNext()){
     //         String[] ss = scanner.nextLine().split(" ");
     //         Integer a = Integer.parseInt(ss[0]);
@@ -571,7 +257,7 @@ public class BaseTest {
     //         List<String> list = new ArrayList<>();
     //
     //         for (int i = 1; i <=a ; i++) {
-    //             if (isBrother(x,ss[i])){
+    //             if (isBrother(x, ss[i])){
     //                 list.add(ss[i]);
     //             }
     //         }
@@ -587,6 +273,7 @@ public class BaseTest {
     //
     //     }
     // }
+
     public static boolean isBrother(String x, String y) {
         if (x.length() != y.length() || y.equals(x)) {
             return false;
@@ -596,8 +283,6 @@ public class BaseTest {
         Arrays.sort(s);
         Arrays.sort(j);
         return new String(s).equals(new String(j));
-
-
     }
 
     // public static void main(String[] args) throws IOException{
@@ -649,7 +334,7 @@ public class BaseTest {
     //                 } else {
     //                     cur--;
     //                 }
-    //                 if (count > SHOW_THRESHOLD) {
+    //                 if (count > 4) {
     //                     curTop = cur;
     //                 }
     //             } else {
@@ -665,7 +350,7 @@ public class BaseTest {
     //             } else {
     //                 cur++;
     //             }
-    //             if ((cur - curTop < 0 ? cur - curTop + count :  cur - curTop) == SHOW_THRESHOLD  && count > SHOW_THRESHOLD) {
+    //             if ((cur - curTop < 0 ? cur - curTop + count :  cur - curTop) == 4  && count > 4) {
     //                 if (curTop == count) {
     //                     curTop = 1;
     //                 } else {
@@ -675,8 +360,8 @@ public class BaseTest {
     //         }
     //     }
     //
-    //     int min = SHOW_THRESHOLD > count ? count : SHOW_THRESHOLD;
-    //     int max = SHOW_THRESHOLD > count ? SHOW_THRESHOLD : count;
+    //     int min = 4 > count ? count : 4;
+    //     int max = 4 > count ? 4 : count;
     //     for (int i = 0; i < min; ++i) {
     //         System.out.print(curTop + i > max ?  curTop + i - max : curTop + i);
     //         if (i != min - 1) {
@@ -687,41 +372,6 @@ public class BaseTest {
     //     System.out.println(cur);
     // }
 
-    // public static void main(String[] args) {
-    //     Scanner scanner = new Scanner(System.in);
-    //     String line = scanner.nextLine();
-    //     int len = scanner.nextInt();
-    //     scanner.nextLine();
-    //     scanner.close();
-    //
-    //     int maxCount = 0;
-    //     StringBuffer result = new StringBuffer();
-    //     int totalLen = line.length();
-    //     for (int i = 0; i < totalLen; ++i) {
-    //         if (i + len <= totalLen) {
-    //             String sub = line.substring(i, i + len);
-    //             int count = findCGCount(sub);
-    //             if (count > maxCount) {
-    //                 maxCount = count;
-    //                 result.setLength(0);
-    //                 result.append(sub);
-    //             }
-    //         }
-    //     }
-    //     System.out.println(result);
-    // }
-
-    private static int findCGCount(String s) {
-        int length = s.length();
-        int count = 0;
-        for (int i = 0; i < length; ++i) {
-            char c = s.charAt(i);
-            if (c == 'C' || c == 'G') {
-                count++;
-            }
-        }
-        return count;
-    }
 
     // public static void main(String[] args) {
     //     Scanner scanner = new Scanner(System.in);
@@ -837,44 +487,6 @@ public class BaseTest {
     //     System.out.println(buffer);
     // }
 
-    private static String quickSortByEveryTwoElement(char[] array) {
-        quickSortByEveryTwoElementInternal(array, 0, array.length - 1);
-        return new String(array);
-    }
-
-    private static void quickSortByEveryTwoElementInternal(char[] array, int left, int right) {
-        while (left < right) {
-            int pivotOdd = partition(array, left, right);
-            quickSortByEveryTwoElementInternal(array, left, pivotOdd - 1);
-            quickSortByEveryTwoElementInternal(array, pivotOdd + 1, right);
-
-            int pivotEven = partition(array, left + 1, right);
-            quickSortByEveryTwoElementInternal(array, left + 1, pivotEven - 1);
-            quickSortByEveryTwoElementInternal(array, pivotEven + 1, right);
-        }
-    }
-
-    private static int partition(char[] array, int left, int right) {
-        char pivot = array[left];
-        boolean leftEven = left % 2 == 0;
-        boolean rightEven = right % 2 == 0;
-        int r = leftEven && !rightEven || !leftEven && rightEven ? right - 1 : right;
-
-        while (left < r) {
-            while (left < r && pivot <= array[r]) {
-                r = r - 2;
-            }
-            array[left] = array[r];
-            while (left < r && pivot > array[left]) {
-                left = left + 2;
-            }
-            array[r] = array[left];
-        }
-
-        array[left] = pivot;
-        return left;
-    }
-
 
     // A类地址从1.0.0.0到126.255.255.255;
     // B类地址从128.0.0.0到191.255.255.255;
@@ -884,8 +496,6 @@ public class BaseTest {
     // 从10.0.0.0到10.255.255.255
     // 从172.16.0.0到172.31.255.255
     // 从192.168.0.0到192.168.255.255
-    // @Test
-    // public void test07() {
     // public static void main(String[] args) {
     //     List<Long> masks = new ArrayList<>();
     //     masks.add(transferIP2Long("255.255.255.0"));
@@ -1007,37 +617,32 @@ public class BaseTest {
     //     }
     // }
 
-    private static void quickSort(int[] array) {
-        quickSort(array, 0, array.length - 1);
+    private int sumBySynchronized;
+    private AtomicInteger atomicSum = new AtomicInteger();
+    private volatile int volatileSum;
+    private synchronized void addToSum(int n) {
+        sumBySynchronized += n;
     }
 
-    private static void quickSort(int[] array, int left, int right) {
-        if (left < right) {
-            int pivot = partition(array, left, right);
-            quickSort(array, left, pivot);
-            quickSort(array, pivot + 1, right);
-
+    @Test
+    public void add1To100Using10Threads() {
+        for (int i = 1; i <= 100; i = i + 10) {
+            MyThread myThread = new MyThread(i);
+            myThread.start();
         }
-    }
 
-    private static int partition(int[] array, int left, int right) {
-        int pivot = array[left];
-        while (left < right) {
-            while (left < right && array[right] > pivot) {
-                right--;
-            }
-            array[left] = array[right];
-            while (left < right && array[left] <= pivot) {
-                left++;
-            }
-            array[right] = array[left];
+        while (Thread.activeCount() > 1) {
+            Thread.yield();
         }
-        array[left] = pivot;
-        return left;
-    }
+        log.info(">>>>> SUM_BY_SYNCHRONIZED: [{}]", sumBySynchronized);
+        log.info(">>>>> ATOMIC_SUM: [{}]", atomicSum);
+        log.info(">>>>> VOLATILE_SUM: [{}]", volatileSum);
 
-    private synchronized void addSum(int n) {
-        sum += n;
+        int result = 0;
+        for (int i = 1; i <= 100; ++i) {
+            result += i;
+        }
+        log.info(">>>>> CORRECT_RESULT: [{}]", result);
     }
 
     class MyThread extends Thread {
@@ -1047,7 +652,6 @@ public class BaseTest {
             this.start = start;
         }
 
-
         @Override
         public void run() {
             int sum = 0;
@@ -1055,26 +659,26 @@ public class BaseTest {
                 sum += start++;
             }
             // log.info(">>>>> THREAD_NAME: [{}], SUM: [{}]", Thread.currentThread().getName(), sum);
-            // addSum(sum);
-            // s.addAndGet(sum);
+
+            addToSum(sum);                              // method1
+            atomicSum.addAndGet(sum);           // method2
+
             // 这里有问题, 编译器都提示 += 不是原子操作, 所以即使 v 是 volatile, 某线程修改了 v, 会保证其他线程读到的 v 一定是修改过后的 v,
             // 但是 v += sum 是读后再加 sum, 有可能读到修改后的 v 后, 又被其他线程抢到 CPU 时间片, 且又修改了 v, 那么当前线程计算时的 v 跟主内存中的 v 不一致
-            // 本例中 1000 个线程可以试问题复现
-            v += sum;
+            // 本例中将线程数设置到足够大才可以使问题复现
+            volatileSum += sum;                             // method3
         }
     }
 
-    private static final int THREADS_COUNT = 20;
-    public static volatile int count = 0;
-
-    public static void increase() {
-        count++;
+    private static volatile int number = 0;
+    private static void increase() {
+        number++;
     }
 
     @Test
-    public void test() {
-        Thread[] threads = new Thread[THREADS_COUNT];
-        for (int i = 0; i < THREADS_COUNT; i++) {
+    public void volatileNotSuitable() {
+        Thread[] threads = new Thread[20];
+        for (int i = 0; i < threads.length; i++) {
             threads[i] = new Thread(() -> {
                 for (int i1 = 0; i1 < 1000; i1++) {
                     increase();
@@ -1086,7 +690,32 @@ public class BaseTest {
         while (Thread.activeCount() > 1) {
             Thread.yield();
         }
-        System.out.println(count);
+        log.info(">>>>> NUMBER: [{}]", number);
+    }
+
+    @Test
+    public void ensureChildThreadCouldExecuteComplete() throws InterruptedException {
+        Thread thread = new Thread(() -> {
+            while (true) {
+                try {
+                    TimeUnit.SECONDS.sleep(3);
+                    log.info(">>>> sleep 3 s");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+        // method1
+        // thread.join();
+
+        // method2
+        while(Thread.activeCount() > 1) {
+            Thread.yield();
+        }
+
+        // method3
+        // Thread.currentThread().join();
     }
 
 }

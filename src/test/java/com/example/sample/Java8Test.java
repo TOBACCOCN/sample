@@ -3,10 +3,12 @@ package com.example.sample;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
+import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.io.*;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.Clock;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,7 +19,7 @@ public class Java8Test {
     // private static Logger logger = LoggerFactory.getLogger(Java8Tests.class);
 
     @Test
-    public void test() throws ScriptException {
+    public void stream() throws ScriptException {
         List<Integer> list = Arrays.asList(8, 9, 8, 1, 1, 1, 4);
         Map<Integer, Integer> map = new HashMap<>();
         // 串行流,顺序固定
@@ -63,33 +65,21 @@ public class Java8Test {
         // Java8 Base64 内置
         log.info(">>>>> BASE64 OF [{}]: [{}]", "zhangyonghong", Base64.getEncoder().encodeToString("zhangyonghong".getBytes()));
         log.info(">>>>> BASE64_DECODER OF [{}]: [{}]", "emhhbmd5b25naG9uZw==", new String(Base64.getDecoder().decode("emhhbmd5b25naG9uZw==")));
-        // 可以运行js代码的引擎
-        log.info(">>>>> JAVA_SCRIPT: [{}]",
-                new ScriptEngineManager().getEngineByName("JavaScript").eval("function f() {return 10;}f()*10;"));
     }
 
 
     @Test
-    public void test01() throws IOException, ScriptException {
+    public void script() throws IOException, ScriptException, NoSuchMethodException {
+        // 运行 js 代码
+        log.info(">>>>> JAVA_SCRIPT: [{}]",
+                new ScriptEngineManager().getEngineByName("JavaScript").eval("function f() {return 10;}f()*10;"));
+
+        // 运行 js 文件中的代码
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
-        //使用管道流，将输出流转为输入流
-        PipedReader prd = new PipedReader();
-        PipedWriter pwt = new PipedWriter(prd);
-//设置执行结果内容的输出流
-        engine.getContext().setWriter(pwt);
-//js文件的路径
-        String strFile =  "C:\\Users\\TOBACCO\\Desktop\\javascript\\dCCTc.js";
-        Reader reader = new FileReader(strFile);
-        engine.eval(reader);
-        BufferedReader br = new BufferedReader(prd);
-//开始读执行结果数据
-        String str ;
-        while ((str = br.readLine()) != null && str.length() > 0) {
-            System.out.println(str);
-        }
-        br.close();
-        pwt.close();
-        prd.close();
+        String path = "C:\\Users\\TOBACCO\\Desktop\\javascript\\hello.js";     // function hello(arg) {return "hello " +arg}
+        engine.eval(new FileReader(path));
+        Object result = ((Invocable) engine).invokeFunction("hello", new Object[]{"JavaScript"});
+        log.info(">>>>> RESULT: [{}]", result);
     }
 
 }
