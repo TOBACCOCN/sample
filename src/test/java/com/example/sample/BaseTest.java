@@ -3,10 +3,12 @@ package com.example.sample;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
@@ -44,87 +46,87 @@ public class BaseTest {
         log.info(">>>>> COUNT: [{}], COST: [{}]MS", count, System.currentTimeMillis() - start);
     }
 
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        String line = sc.nextLine();
-        sc.close();
-
-        if (line.indexOf("joker") >= 0 || line.indexOf("JOKER") >= 0) {
-            System.out.println("ERROR");
-            return;
-        }
-
-        int[] array = new int[4];
-        for (int i = 0; i < 4; ++i) {
-            String num = String.valueOf(line.charAt(i * 2));
-            if ("J".equals(num)) {
-                array[i] = 11;
-            } else if ("Q".equals(num)) {
-                array[i] = 12;
-            } else if ("K".equals(num)) {
-                array[i] = 13;
-            } else if ("A".equals(num)) {
-                array[i] = 1;
-            } else {
-                array[i] = Integer.parseInt(num);
-            }
-        }
-        List<Integer> included = new ArrayList<>();
-        String[] result = new String[7];
-        findResult(result, 24, array, included);
-        if (result[0].equals("NONE")) {
-            System.out.println("NONE");
-            return;
-        }
-
-        for (int i = 0; i < result.length; ++i) {
-            System.out.print(result[i]);
-            if (i == result.length - 1) {
-                System.out.println();
-            }
-        }
-    }
-
-    private static void findResult(String[] result, int target, int[] array,
-                                   List<Integer> included) {
-        int resultLen = result.length;
-        for (int i = 0; i < array.length; i++) {
-            if (included.contains((Integer) i)) {
-                continue;
-            }
-            included.add((Integer) i);
-
-            result[resultLen - 1 - i] = String.valueOf(array[i]);
-            result[resultLen - 2 - i] = "+";
-            findResult(result, target - array[i], array, included);
-            if (!"NONE".equals(result[0])) {
-                return;
-            }
-
-            result[resultLen - 2 - i] = "-";
-            findResult(result, target + array[i], array, included);
-            if (!"NONE".equals(result[0])) {
-                return;
-            }
-
-            result[resultLen - 2 - i] = "/";
-            findResult(result, target * array[i], array, included);
-            if (!"NONE".equals(result[0])) {
-                return;
-            }
-
-            if (target % array[i] != 0) {
-                continue;
-            }
-            result[resultLen - 2 - i] = "*";
-            findResult(result, target / array[i], array, included);
-            if (!"NONE".equals(result[0])) {
-                return;
-            }
-            included.remove(Integer.valueOf(i));
-        }
-        result[0] = "NONE";
-    }
+    // public static void main(String[] args) {
+    //     Scanner sc = new Scanner(System.in);
+    //     String line = sc.nextLine();
+    //     sc.close();
+    //
+    //     if (line.indexOf("joker") >= 0 || line.indexOf("JOKER") >= 0) {
+    //         System.out.println("ERROR");
+    //         return;
+    //     }
+    //
+    //     int[] array = new int[4];
+    //     for (int i = 0; i < 4; ++i) {
+    //         String num = String.valueOf(line.charAt(i * 2));
+    //         if ("J".equals(num)) {
+    //             array[i] = 11;
+    //         } else if ("Q".equals(num)) {
+    //             array[i] = 12;
+    //         } else if ("K".equals(num)) {
+    //             array[i] = 13;
+    //         } else if ("A".equals(num)) {
+    //             array[i] = 1;
+    //         } else {
+    //             array[i] = Integer.parseInt(num);
+    //         }
+    //     }
+    //     List<Integer> included = new ArrayList<>();
+    //     String[] result = new String[7];
+    //     findResult(result, 24, array, included);
+    //     if (result[0].equals("NONE")) {
+    //         System.out.println("NONE");
+    //         return;
+    //     }
+    //
+    //     for (int i = 0; i < result.length; ++i) {
+    //         System.out.print(result[i]);
+    //         if (i == result.length - 1) {
+    //             System.out.println();
+    //         }
+    //     }
+    // }
+    //
+    // private static void findResult(String[] result, int target, int[] array,
+    //                                List<Integer> included) {
+    //     int resultLen = result.length;
+    //     for (int i = 0; i < array.length; i++) {
+    //         if (included.contains((Integer) i)) {
+    //             continue;
+    //         }
+    //         included.add((Integer) i);
+    //
+    //         result[resultLen - 1 - i] = String.valueOf(array[i]);
+    //         result[resultLen - 2 - i] = "+";
+    //         findResult(result, target - array[i], array, included);
+    //         if (!"NONE".equals(result[0])) {
+    //             return;
+    //         }
+    //
+    //         result[resultLen - 2 - i] = "-";
+    //         findResult(result, target + array[i], array, included);
+    //         if (!"NONE".equals(result[0])) {
+    //             return;
+    //         }
+    //
+    //         result[resultLen - 2 - i] = "/";
+    //         findResult(result, target * array[i], array, included);
+    //         if (!"NONE".equals(result[0])) {
+    //             return;
+    //         }
+    //
+    //         if (target % array[i] != 0) {
+    //             continue;
+    //         }
+    //         result[resultLen - 2 - i] = "*";
+    //         findResult(result, target / array[i], array, included);
+    //         if (!"NONE".equals(result[0])) {
+    //             return;
+    //         }
+    //         included.remove(Integer.valueOf(i));
+    //     }
+    //     result[0] = "NONE";
+    // }
 
     private static boolean solveSudokuHelper(char[][] board) {
         //「一个for循环遍历棋盘的行，一个for循环遍历棋盘的列，
@@ -496,100 +498,95 @@ public class BaseTest {
     // 从10.0.0.0到10.255.255.255
     // 从172.16.0.0到172.31.255.255
     // 从192.168.0.0到192.168.255.255
-    // public static void main(String[] args) {
-    //     List<Long> masks = new ArrayList<>();
-    //     masks.add(transferIP2Long("255.255.255.0"));
-    //     masks.add(transferIP2Long("255.255.0.0"));
-    //     masks.add(transferIP2Long("255.0.0.0"));
-    //     long minIgnore1 = transferIP2Long("0.0.0.0");
-    //     long maxIgnore1 = transferIP2Long("0.255.255.255");
-    //     long minIgnore2 = transferIP2Long("127.0.0.0");
-    //     long maxIgnore2 = transferIP2Long("127.255.255.255");
-    //     long minA = transferIP2Long("1.0.0.0");
-    //     long maxA = transferIP2Long("126.255.255.255");
-    //     long minB = transferIP2Long("128.0.0.0");
-    //     long maxB = transferIP2Long("191.255.255.255");
-    //     long minC = transferIP2Long("192.0.0.0");
-    //     long maxC = transferIP2Long("223.255.255.255");
-    //     long minD = transferIP2Long("224.0.0.0");
-    //     long maxD = transferIP2Long("239.255.255.255");
-    //     long minE = transferIP2Long("240.0.0.0");
-    //     long maxE = transferIP2Long("255.255.255.255");
-    //     long minP1 = transferIP2Long("10.0.0.0");                        // > minA
-    //     long maxP1 = transferIP2Long("10.255.255.255");         // < maxA
-    //     long minP2 = transferIP2Long("172.16.0.0");                   // > minB
-    //     long maxP2 = transferIP2Long("172.31.255.255");         // < maxB
-    //     long minP3 = transferIP2Long("192.168.0.0");                // > minC
-    //     long maxP3 = transferIP2Long("192.168.255.255");      // < maxC
-    //
-    //     Scanner scanner = new Scanner(System.in);
-    //     StringBuilder s = new StringBuilder();
-    //     int[] result = new int[7];
-    //     List<String> aList = new ArrayList<>();
-    //     List<String> bList = new ArrayList<>();
-    //     List<String> cList = new ArrayList<>();
-    //     List<String> dList = new ArrayList<>();
-    //     List<String> eList = new ArrayList<>();
-    //     List<String> iList = new ArrayList<>();
-    //     List<String> nList = new ArrayList<>();
-    //     List<String> pList = new ArrayList<>();
-    //     while (scanner.hasNext()) {
-    //         String ipAndMask = scanner.next();
-    //         if ("end".equals(ipAndMask)) {
-    //             break;
-    //         }
-    //
-    //         String[] array = ipAndMask.split("~");
-    //         long longOfIp = transferIP2Long(array[0]);
-    //         long longOfMask = transferIP2Long(array[1]);
-    //
-    //         if (longOfIp >= minIgnore1 && longOfIp <= maxIgnore1 || longOfIp >= minIgnore2 && longOfIp <= maxIgnore2) {
-    //             iList.add(ipAndMask);
-    //             continue;
-    //         }
-    //
-    //         if (!masks.contains(longOfMask)) {
-    //             result[5]++;
-    //             nList.add(ipAndMask);
-    //             continue;
-    //         }
-    //         if (longOfIp == -1) {
-    //             result[5]++;
-    //             nList.add(ipAndMask);
-    //         } else if (longOfIp >= minP1 && longOfIp <= maxP1 || longOfIp >= minP2 && longOfIp <= maxP2 || longOfIp >= minP3 && longOfIp <= maxP3) {
-    //             result[6]++;
-    //             pList.add(ipAndMask);
-    //         } else if (longOfIp >= minA && longOfIp <= maxA) {
-    //             result[0]++;
-    //             aList.add(ipAndMask);
-    //         } else if (longOfIp >= minB && longOfIp <= maxB) {
-    //             result[1]++;
-    //             bList.add(ipAndMask);
-    //         } else if (longOfIp >= minC && longOfIp <= maxC) {
-    //             result[2]++;
-    //             cList.add(ipAndMask);
-    //         } else if (longOfIp >= minD && longOfIp <= maxD) {
-    //             result[3]++;
-    //             dList.add(ipAndMask);
-    //         } else if (longOfIp >= minE && longOfIp <= maxE) {
-    //             result[4]++;
-    //             eList.add(ipAndMask);
-    //         }
-    //     }
-    //     for (int i : result) {
-    //         s.append(i).append(" ");
-    //     }
-    //     System.out.println(s.substring(0, s.length() - 1));
-    //     System.out.println(aList);
-    //     System.out.println(bList);
-    //     System.out.println(cList);
-    //     System.out.println(dList);
-    //     System.out.println(eList);
-    //     System.out.println(iList);
-    //     System.out.println(nList);
-    //     System.out.println(pList);
-    //     scanner.close();
-    // }
+    public static void main(String[] args) throws IOException {
+        List<Long> masks = new ArrayList<>();
+        masks.add(transferIP2Long("255.255.255.0"));
+        masks.add(transferIP2Long("255.255.0.0"));
+        masks.add(transferIP2Long("255.0.0.0"));
+        long minIgnore1 = transferIP2Long("0.0.0.0");
+        long maxIgnore1 = transferIP2Long("0.255.255.255");
+        long minIgnore2 = transferIP2Long("127.0.0.0");
+        long maxIgnore2 = transferIP2Long("127.255.255.255");
+        long minA = transferIP2Long("1.0.0.0");
+        long maxA = transferIP2Long("126.255.255.255");
+        long minB = transferIP2Long("128.0.0.0");
+        long maxB = transferIP2Long("191.255.255.255");
+        long minC = transferIP2Long("192.0.0.0");
+        long maxC = transferIP2Long("223.255.255.255");
+        long minD = transferIP2Long("224.0.0.0");
+        long maxD = transferIP2Long("239.255.255.255");
+        long minE = transferIP2Long("240.0.0.0");
+        long maxE = transferIP2Long("255.255.255.255");
+        long minP1 = transferIP2Long("10.0.0.0");                        // > minA
+        long maxP1 = transferIP2Long("10.255.255.255");         // < maxA
+        long minP2 = transferIP2Long("172.16.0.0");                   // > minB
+        long maxP2 = transferIP2Long("172.31.255.255");         // < maxB
+        long minP3 = transferIP2Long("192.168.0.0");                // > minC
+        long maxP3 = transferIP2Long("192.168.255.255");      // < maxC
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int[] result = new int[7];
+        List<String> aList = new ArrayList<>();
+        List<String> bList = new ArrayList<>();
+        List<String> cList = new ArrayList<>();
+        List<String> dList = new ArrayList<>();
+        List<String> eList = new ArrayList<>();
+        List<String> iList = new ArrayList<>();
+        List<String> nList = new ArrayList<>();
+        List<String> pList = new ArrayList<>();
+        String ipAndMask;
+        while ((ipAndMask = br.readLine()) != null && !"".equals(ipAndMask)) {
+            String[] array = ipAndMask.split("~");
+            long longOfIp = transferIP2Long(array[0]);
+            long longOfMask = transferIP2Long(array[1]);
+
+            if (longOfIp >= minIgnore1 && longOfIp <= maxIgnore1 || longOfIp >= minIgnore2 && longOfIp <= maxIgnore2) {
+                iList.add(ipAndMask);
+                continue;
+            }
+
+            if (!masks.contains(longOfMask)) {
+                result[5]++;
+                nList.add(ipAndMask);
+                continue;
+            }
+            if (longOfIp == -1) {
+                result[5]++;
+                nList.add(ipAndMask);
+            } else if (longOfIp >= minP1 && longOfIp <= maxP1 || longOfIp >= minP2 && longOfIp <= maxP2 || longOfIp >= minP3 && longOfIp <= maxP3) {
+                result[6]++;
+                pList.add(ipAndMask);
+            } else if (longOfIp >= minA && longOfIp <= maxA) {
+                result[0]++;
+                aList.add(ipAndMask);
+            } else if (longOfIp >= minB && longOfIp <= maxB) {
+                result[1]++;
+                bList.add(ipAndMask);
+            } else if (longOfIp >= minC && longOfIp <= maxC) {
+                result[2]++;
+                cList.add(ipAndMask);
+            } else if (longOfIp >= minD && longOfIp <= maxD) {
+                result[3]++;
+                dList.add(ipAndMask);
+            } else if (longOfIp >= minE && longOfIp <= maxE) {
+                result[4]++;
+                eList.add(ipAndMask);
+            }
+        }
+        br.close();
+        for (int i : result) {
+            System.out.print(i + " ");
+        }
+        System.out.println();
+        System.out.println(aList);
+        System.out.println(bList);
+        System.out.println(cList);
+        System.out.println(dList);
+        System.out.println(eList);
+        System.out.println(iList);
+        System.out.println(nList);
+        System.out.println(pList);
+    }
 
     private static long transferIP2Long(String ip) {
         String regex255 = "(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)";

@@ -4,29 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Date;
 
 @Slf4j
 public class TimeUtilTest {
-
-    @Test
-    public void getZoneOffset() {
-        int zoneOffset = TimeUtil.getZoneOffset(7.5);
-        log.info(">>>>> zoneOffset: [{}]", zoneOffset);
-        Assert.assertTrue("zoneOffset 应处于 -12 到 12 之间", zoneOffset >= -12 && zoneOffset <= 12);
-    }
-
-    @Test
-    public void getUtcTime() throws Exception {
-        String utcTime = TimeUtil.format(TimeUtil.date2LocalDateTime(TimeUtil.getUtcTime()), "yyyy-MM-dd HH:mm:ss");
-        // String utcTime = TimeUtil.format(Calendar.getInstance().getTime(), "yyyy-MM-dd HH:mm:ss");
-        log.info(">>>>> utcTime: [{}]", utcTime);
-        Assert.assertNotNull("utcTime 不应为空", utcTime);
-        String utc = Clock.systemUTC().instant().toString();
-        log.info(">>>>> utc: [{}]", utc);
-    }
 
     @Test
     public void date2LocalDateTime() {
@@ -40,5 +22,39 @@ public class TimeUtilTest {
         Date date = TimeUtil.localDateTime2Date(LocalDateTime.now());
         log.info(">>>>> date: [{}]", date);
         Assert.assertNotNull("date 不应为空", date);
+    }
+
+    @Test
+    public void getUtcTime() throws Exception {
+        LocalDateTime utcTime = TimeUtil.getUtcTime();
+        log.info(">>>>> utcTime: [{}]", utcTime);
+        Assert.assertNotNull("utcTime 不应为空", utcTime);
+    }
+
+    @Test
+    public void local2Utc() {
+        LocalDateTime utcDateTime = TimeUtil.local2Utc(LocalDateTime.now());
+        log.info(">>>>> utcDateTime: [{}]", utcDateTime);
+        Assert.assertNotNull("utcDateTime 不应为空", utcDateTime);
+    }
+
+    @Test
+    public void utc2Local() {
+        LocalDateTime localDateTime = TimeUtil.utc2Local(TimeUtil.local2Utc(LocalDateTime.now().plusHours(2)));
+        log.info(">>>>> localDateTime: [{}]", localDateTime);
+        Assert.assertNotNull("localDateTime 不应为空", localDateTime);
+    }
+
+    @Test
+    public void utc2Other() throws Exception {
+        LocalDateTime other = TimeUtil.utc2Other(TimeUtil.getUtcTime(), -7.6);
+        log.info(">>>>> other: [{}]", other);
+    }
+
+    @Test
+    public void getZoneOffset() throws Exception {
+        int zoneOffsetHours = TimeUtil.getZoneOffsetHours(173);
+        log.info(">>>>> zoneOffsetHours: [{}]", zoneOffsetHours);
+        Assert.assertTrue("zoneOffsetHours 应处于 -12 到 12 之间", zoneOffsetHours >= -12 && zoneOffsetHours <= 12);
     }
 }

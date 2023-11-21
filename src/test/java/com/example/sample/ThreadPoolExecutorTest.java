@@ -20,8 +20,8 @@ public class ThreadPoolExecutorTest {
         int STOP = 1 << COUNT_BITS;
         int TIDYING = 2 << COUNT_BITS;
         int TERMINATED = 3 << COUNT_BITS;
-        log.info(">>>>> CAPACITY: [{}], RUNNING: [{}], SHUTDOWN: [{}], STOP: [{}], TIDYING: [{}], TERMINATED: [{}]",
-                Integer.toBinaryString(CAPACITY), Integer.toBinaryString(RUNNING), Integer.toBinaryString(SHUTDOWN),
+        log.info(">>>>> CAPACITY: [{}], ~CAPACITY: [{}], RUNNING: [{}], SHUTDOWN: [{}], STOP: [{}], TIDYING: [{}], TERMINATED: [{}]",
+                Integer.toBinaryString(CAPACITY), Integer.toBinaryString(~CAPACITY), Integer.toBinaryString(RUNNING), Integer.toBinaryString(SHUTDOWN),
                 Integer.toBinaryString(STOP), Integer.toBinaryString(TIDYING), Integer.toBinaryString(TERMINATED));
         // SHUTDOWN:                                                                            [0],
         // CAPACITY:                                [11111111111111111111111111111],
@@ -43,8 +43,8 @@ public class ThreadPoolExecutorTest {
         ThreadFactory threadFactory = Executors.defaultThreadFactory();
         // RejectedExecutionHandler handler = new ThreadPoolExecutor.AbortPolicy();
         // RejectedExecutionHandler handler = new ThreadPoolExecutor.CallerRunsPolicy();
-        // RejectedExecutionHandler handler = new ThreadPoolExecutor.DiscardOldestPolicy();
-        RejectedExecutionHandler handler = new ThreadPoolExecutor.DiscardPolicy();
+        RejectedExecutionHandler handler = new ThreadPoolExecutor.DiscardOldestPolicy();
+        // RejectedExecutionHandler handler = new ThreadPoolExecutor.DiscardPolicy();
         ThreadPoolExecutor executor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
 
         Runnable runnable = () -> {
@@ -67,10 +67,11 @@ public class ThreadPoolExecutorTest {
         executor.execute(runnable);
         executor.execute(runnable);
         executor.execute(runnable);
+
         // executor.execute(runnable);      // AbortPolicy: java.util.concurrent.RejectedExecutionException: Task com.example.sample.ThreadPoolExecutorTest$$Lambda$1/1466073198@161b062a rejected from java.util.concurrent.ThreadPoolExecutor@2d9d4f9d[Running, pool size = 2, active threads = 2, queued tasks = 2, completed tasks = 0]
         // executor.execute(runnable);      // CallerRunsPolicy: 在调用者线程中 执行该 runnable 的 run 方法
-        // executor.execute(runnable2);      // DiscardOldestPolicy: runnable2 中的 run 方法会挤掉其中一 runnable 的 run 方法
-        executor.execute(runnable2);      // DiscardPolicy: 丢弃 runnable2 中 的 run 方法，不执行
+        executor.execute(runnable2);      // DiscardOldestPolicy: runnable2 中的 run 方法会挤掉其中一 runnable 的 run 方法
+        // executor.execute(runnable2);      // DiscardPolicy: 丢弃 runnable2 中 的 run 方法，不执行
 
         executor.shutdown();
 

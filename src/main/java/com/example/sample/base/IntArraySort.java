@@ -29,8 +29,9 @@ public class IntArraySort {
 
     }
 
-    private static void mergeSortInternal(int[] array, int[] temp, int l, int mid, int r) {
+    private static void mergeSortInternal(int[] array, int l, int mid, int r) {
         int i = l, j = mid + 1, k = 0;
+        int[] temp = new int[r - l + 1];
         while (i <= mid && j <= r) {
             temp[k++] = array[i] < array[j] ? array[i++] : array[j++];
         }
@@ -45,13 +46,14 @@ public class IntArraySort {
         }
     }
 
-    private static void mergeSort0(int[] array, int[] temp, int l, int r) {
-        if (l < r) {
-            int mid = (l + r) / 2;
-            mergeSort0(array, temp, l, mid);
-            mergeSort0(array, temp, mid + 1, r);
-            mergeSortInternal(array, temp, l, mid, r);
+    private static void mergeSort0(int[] array, int l, int r) {
+        if (l == r) {
+            return;
         }
+        int mid = (l + r) >> 1;
+        mergeSort0(array, l, mid);
+        mergeSort0(array, mid + 1, r);
+        mergeSortInternal(array, l, mid, r);
     }
 
     public static void mergeSort(int[] array) {
@@ -59,8 +61,7 @@ public class IntArraySort {
             return;
         }
 
-        int[] temp = new int[array.length];
-        mergeSort0(array, temp, 0, array.length - 1);
+        mergeSort0(array, 0, array.length - 1);
     }
 
     private static int partition(int[] array, int left, int right) {

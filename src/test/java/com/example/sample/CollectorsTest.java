@@ -47,104 +47,48 @@ public class CollectorsTest {
     }
 
     @Test
-    public void averagingDouble() {
-        Double averageTotalScore = students.stream().collect(Collectors.averagingDouble(Student::getTotalScore));
-        log.info(">>>>> averageTotalScore: [{}]", averageTotalScore);
-    }
-
-    @Test
-    public void collectingAndThen() {
-        List<Student> unmodifiedList = students.stream().collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-        // unmodifiedList.remove(0);   // 报错
-        log.info(">>>>> unmodifiedList: [{}]", unmodifiedList);
-    }
-
-    @Test
-    public void groupingBy() {
-        // 1 groupingBy(Function)
-        Map<Grade, List<Student>> grade2StudentsMap = students.stream().collect(Collectors.groupingBy(Student::getGrade));
-        log.info(">>>>> grade2StudentsMap: [{}]", grade2StudentsMap);
-
-        // 2 groupingBy(Function, Collector)
-        Map<Grade, Long> grade2StudentsCountMap = students.stream().collect(Collectors.groupingBy(Student::getGrade, Collectors.counting()));
-        log.info(">>>>> grade2StudentsCountMap: [{}]", grade2StudentsCountMap);
-
-        // 3 groupingBy(Function, Supplier, Collector)
-        TreeMap<Grade, Double> grade2AverageScoreMap = students.stream()
-                .collect(Collectors.groupingBy(Student::getGrade, TreeMap::new, Collectors.averagingDouble(Student::getTotalScore)));
-        log.info(">>>>> grade2AverageScoreMap: [{}]", grade2AverageScoreMap);
-    }
-
-    @Test
-    public void joining() {
-        // 1 joining
-        String joinedNames = students.stream().map(Student::getName).collect(Collectors.joining());
-        log.info(">>>>> joinedNames: [{}]", joinedNames);
-
-        // 2 joining(delimiter)
-        joinedNames = students.stream().map(Student::getName).collect(Collectors.joining(", "));
-        log.info(">>>>> joinedNames: [{}]", joinedNames);
-
-        // 3 joining(delimiter, prefix, suffix)
-        joinedNames = students.stream().map(Student::getName).collect(Collectors.joining(", ", "所有学生:[", "]"));
-        log.info(">>>>> joinedNames: [{}]", joinedNames);
-    }
-
-    @Test
-    public void mapping() {
-        String joinedNames = students.stream().collect(Collectors.mapping(Student::getName, Collectors.joining(", ")));       // 建议用下面的 stream().map().collect() 代替
-        // joinedNames = students.stream().map(Student::getName).collect(Collectors.joining());
-        log.info(">>>>> joinedNames: [{}]", joinedNames);
-    }
-
-    @Test
     public void maxByMinBy() {
         // 1 maxBy
-        Optional<Student> maxByTotalScoreStudent = students.stream().collect(Collectors.maxBy(Comparator.comparing(Student::getTotalScore)));       // 建议用下面的 stream().max() 代替
+        Optional<Student> maxByTotalScoreStudent = students.stream().collect(Collectors.maxBy(Comparator.comparing(Student::getTotalScore)));
+        // 建议用下面的 stream().max() 代替
         // Optional<Student> maxByTotalScoreStudent = students.stream().max(Comparator.comparing(Student::getTotalScore));
         maxByTotalScoreStudent.ifPresent(o -> log.info(">>>>> maxByTotalScoreStudent: [{}]", o));
 
         // 2 minBy
-        Optional<Student> mimByTotalScoreStudent = students.stream().collect(Collectors.minBy(Comparator.comparing(Student::getTotalScore)));       // 建议用下面的 stream().min() 代替
+        Optional<Student> mimByTotalScoreStudent = students.stream().collect(Collectors.minBy(Comparator.comparing(Student::getTotalScore)));
+        // 建议用下面的 stream().min() 代替
         // Optional<Student> mimByTotalScoreStudent = students.stream().min(Comparator.comparing(Student::getTotalScore));
         mimByTotalScoreStudent.ifPresent(o -> log.info(">>>>> mimByTotalScoreStudent: [{}]", o));
     }
 
     @Test
-    public void partitioningBy() {
-        // 1 partitioningBy(Function)
-        Map<Boolean, List<Student>> isLocal2StudentsMap = students.stream().collect(Collectors.partitioningBy(Student::isLocal));
-        log.info(">>>>> isLocal2StudentsMap: [{}]", isLocal2StudentsMap);
-
-        // 2 partitionBy(Function, Collector)
-        Map<Boolean, List<String>> isLocal2StudentNamesMap = students.stream()
-                .collect(Collectors.partitioningBy(Student::isLocal, Collectors.mapping(Student::getName, Collectors.toList())));
+    public void counting() {
+        Long counting = students.stream().collect(Collectors.counting());
+        // 建议用下面的 stream().count() 代替
+        // Long counting = students.stream().count();
+        log.info(">>>>> counting: [{}]", counting);
     }
 
     @Test
-    public void reducing() {
-        // 1 reducing(BinaryOperator)
-        Optional<Student> maxTotalScoreStudent = students.stream()
-                .collect(Collectors.reducing(BinaryOperator.maxBy(Comparator.comparing(Student::getTotalScore))));        // 建议将 reducing 的参数直接传给 stream() 的 reduce()
-        // Optional<Student> maxTotalScoreStudent = students.stream()
-        //         .reduce(BinaryOperator.maxBy(Comparator.comparing(Student::getTotalScore)));
-        maxTotalScoreStudent.ifPresent(v -> log.info(">>>>> maxTotalScoreStudent: [{}]", v));
-        // 这里的 reducing 无法用 stream().reduce() 代替
-        Map<Grade, Optional<Student>> grade2MaxScoreStudentOptionalMap = students.stream()
-                .collect(Collectors.groupingBy(Student::getGrade, Collectors.reducing(BinaryOperator.maxBy(Comparator.comparing(Student::getTotalScore)))));
-        log.info(">>>>> grade2MaxScoreStudentOptionalMap: [{}]", grade2MaxScoreStudentOptionalMap);
+    public void summing() {
+        Double summingDouble = students.stream().collect(Collectors.summingDouble(Student::getTotalScore));
+        // 建议用下面的 stream().mapToDouble().sum() 代替
+        // Double summingDouble = students.stream().mapToDouble(Student::getTotalScore).sum();
+        log.info(">>>>> summingDouble: [{}]", summingDouble);
+        Integer summingInt = students.stream().collect(Collectors.summingInt(Student::getTotalScore));
+        // 建议用下面的 stream().mapToInt().sum() 代替
+        // Integer summingInt = students.stream().mapToInt(Student::getTotalScore).sum();
+        log.info(">>>>> summingInt: [{}]", summingInt);
+        Long summingLong = students.stream().collect(Collectors.summingLong(Student::getTotalScore));
+        // 建议用下面的 stream().mapToLong().sum() 代替
+        // Long summingLong = students.stream().mapToLong(Student::getTotalScore).sum();
+        log.info(">>>>> summingLong: [{}]", summingLong);
+    }
 
-        // 2 reducing(T, BinaryOperator<T>)
-        Map<Grade, Student> grade2MaxTotalScoreStudentMap = students.stream().collect(Collectors.groupingBy(Student::getGrade,
-                Collectors.reducing(new Student("周八", 688, false, Grade.ONE),
-                        BinaryOperator.maxBy(Comparator.comparing(Student::getTotalScore)))));
-        log.info(">>>>> grade2MaxTotalScoreStudentMap: [{}]", grade2MaxTotalScoreStudentMap);
-
-        // 3 reducing(U, Function<T, U>, BinaryOperator<U>)
-        Map<Grade, Integer> grade2MaxTotalScoreMap = students.stream().collect(Collectors.groupingBy(Student::getGrade,
-                Collectors.reducing(0, Student::getTotalScore,
-                        BinaryOperator.maxBy(Comparator.comparing(Integer::intValue)))));
-        log.info(">>>>> grade2MaxTotalScoreMap: [{}]", grade2MaxTotalScoreMap);
+    @Test
+    public void averagingDouble() {
+        Double averageTotalScore = students.stream().collect(Collectors.averagingDouble(Student::getTotalScore));
+        log.info(">>>>> averageTotalScore: [{}]", averageTotalScore);
     }
 
     @Test
@@ -158,16 +102,6 @@ public class CollectorsTest {
     }
 
     @Test
-    public void summing() {
-        Double summingDouble = students.stream().collect(Collectors.summingDouble(Student::getTotalScore));
-        log.info(">>>>> summingDouble: [{}]", summingDouble);
-        Integer summingInt = students.stream().collect(Collectors.summingInt(Student::getTotalScore));
-        log.info(">>>>> summingInt: [{}]", summingInt);
-        Long summingLong = students.stream().collect(Collectors.summingLong(Student::getTotalScore));
-        log.info(">>>>> summingLong: [{}]", summingLong);
-    }
-
-    @Test
     public void toCollection() {
         ArrayList<Student> collection = students.stream().filter(Student::isLocal).collect(Collectors.toCollection(ArrayList::new));
         log.info(">>>>> collection: [{}]", collection);
@@ -175,6 +109,62 @@ public class CollectorsTest {
         log.info(">>>>> list: [{}]", list);
         Set<Grade> grades = students.stream().map(Student::getGrade).collect(Collectors.toSet());
         log.info(">>>>> grades: [{}]", grades);
+    }
+
+    @Test
+    public void collectingAndThen() {
+        // 1.unmodifiedList
+        List<Student> unmodifiedList = students.stream().collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+        // unmodifiedList.remove(0);   // 报错
+        log.info(">>>>> unmodifiedList: [{}]", unmodifiedList);
+
+        // 2.sort
+        List<Student> sorted = students.stream().collect(Collectors.collectingAndThen(Collectors.toList(), l -> {
+            l.sort((s1, s2) -> s2.totalScore - s1.totalScore);
+            return l;
+        }));
+        log.info(">>>>> sorted: [{}]", sorted);
+    }
+
+    @Test
+    public void joining() {
+        // 1 joining
+        String joinedNames = students.stream().map(Student::getName).collect(Collectors.joining());
+        // 与 String.join 效果一样
+        // String joinedNames = String.join("", students.stream().map(Student::getName).collect(Collectors.toList()));
+        log.info(">>>>> joinedNames: [{}]", joinedNames);
+
+        // 2 joining(delimiter)
+        joinedNames = students.stream().map(Student::getName).collect(Collectors.joining(", "));
+        log.info(">>>>> joinedNames: [{}]", joinedNames);
+
+        // 3 joining(delimiter, prefix, suffix)
+        joinedNames = students.stream().map(Student::getName).collect(Collectors.joining(", ", "所有学生:[", "]"));
+        log.info(">>>>> joinedNames: [{}]", joinedNames);
+    }
+
+    @Test
+    public void mapping() {
+        String joinedNames = students.stream().collect(Collectors.mapping(Student::getName, Collectors.joining(", ")));
+        // 建议用下面的 stream().map().collect() 代替
+        // joinedNames = students.stream().map(Student::getName).collect(Collectors.joining());
+        log.info(">>>>> joinedNames: [{}]", joinedNames);
+
+        List<String> names = students.stream().collect(Collectors.mapping(Student::getName, Collectors.toList()));
+        // 建议用下面的 stream().map().collect() 代替
+        // List<String> names = students.stream().map(Student::getName).collect(Collectors.toList());
+        log.info(">>>>> names: [{}]", names);
+    }
+
+    @Test
+    public void partitioningBy() {
+        // 1 partitioningBy(Function)
+        Map<Boolean, List<Student>> isLocal2StudentsMap = students.stream().collect(Collectors.partitioningBy(Student::isLocal));
+        log.info(">>>>> isLocal2StudentsMap: [{}]", isLocal2StudentsMap);
+
+        // 2 partitionBy(Function, Collector)
+        Map<Boolean, List<String>> isLocal2StudentNamesMap = students.stream()
+                .collect(Collectors.partitioningBy(Student::isLocal, Collectors.mapping(Student::getName, Collectors.toList())));
     }
 
     @Test
@@ -198,6 +188,49 @@ public class CollectorsTest {
         // 3 toConcurrentMap(Function, Function, BinaryOperator, Supplier)
         grade2StudentsCountMap = students.stream().collect(Collectors.toConcurrentMap(Student::getGrade, student -> 1, Integer::sum, ConcurrentSkipListMap::new));
         log.info(">>>>> grade2StudentsCountConcurrentSkipListMap: [{}]", grade2StudentsCountMap);
+    }
+
+    @Test
+    public void groupingBy() {
+        // 1 groupingBy(Function)
+        Map<Grade, List<Student>> grade2StudentsMap = students.stream().collect(Collectors.groupingBy(Student::getGrade));
+        log.info(">>>>> grade2StudentsMap: [{}]", grade2StudentsMap);
+
+        // 2 groupingBy(Function, Collector)
+        Map<Grade, Long> grade2StudentsCountMap = students.stream().collect(Collectors.groupingBy(Student::getGrade, Collectors.counting()));
+        log.info(">>>>> grade2StudentsCountMap: [{}]", grade2StudentsCountMap);
+
+        // 3 groupingBy(Function, Supplier, Collector)
+        TreeMap<Grade, Double> grade2AverageScoreMap = students.stream()
+                .collect(Collectors.groupingBy(Student::getGrade, TreeMap::new, Collectors.averagingDouble(Student::getTotalScore)));
+        log.info(">>>>> grade2AverageScoreMap: [{}]", grade2AverageScoreMap);
+    }
+
+    @Test
+    public void reducing() {
+        // 1 reducing(BinaryOperator)
+        Optional<Student> maxTotalScoreStudent = students.stream()
+                .collect(Collectors.reducing(BinaryOperator.maxBy(Comparator.comparing(Student::getTotalScore))));        // 建议将 reducing 的参数直接传给 stream() 的 reduce()
+        // Optional<Student> maxTotalScoreStudent = students.stream()
+        //         .reduce(BinaryOperator.maxBy(Comparator.comparing(Student::getTotalScore)));
+        maxTotalScoreStudent.ifPresent(v -> log.info(">>>>> maxTotalScoreStudent: [{}]", v));
+        // 这里的 reducing 无法用 stream().reduce() 代替
+        Map<Grade, Optional<Student>> grade2MaxScoreStudentOptionalMap = students.stream()
+                .collect(Collectors.groupingBy(Student::getGrade, Collectors.reducing(BinaryOperator.maxBy(Comparator.comparing(Student::getTotalScore)))));
+                // .collect(Collectors.groupingBy(Student::getGrade, Collectors.maxBy(Comparator.comparing(Student::getTotalScore))));
+        log.info(">>>>> grade2MaxScoreStudentOptionalMap: [{}]", grade2MaxScoreStudentOptionalMap);
+
+        // 2 reducing(T, BinaryOperator<T>)
+        Map<Grade, Student> grade2MaxTotalScoreStudentMap = students.stream().collect(Collectors.groupingBy(Student::getGrade,
+                Collectors.reducing(new Student("周八", 688, false, Grade.ONE),
+                        BinaryOperator.maxBy(Comparator.comparing(Student::getTotalScore)))));
+        log.info(">>>>> grade2MaxTotalScoreStudentMap: [{}]", grade2MaxTotalScoreStudentMap);
+
+        // 3 reducing(U, Function<T, U>, BinaryOperator<U>)
+        Map<Grade, Integer> grade2MaxTotalScoreMap = students.stream().collect(Collectors.groupingBy(Student::getGrade,
+                Collectors.reducing(0, Student::getTotalScore,
+                        BinaryOperator.maxBy(Comparator.comparing(Integer::intValue)))));
+        log.info(">>>>> grade2MaxTotalScoreMap: [{}]", grade2MaxTotalScoreMap);
     }
 
 }

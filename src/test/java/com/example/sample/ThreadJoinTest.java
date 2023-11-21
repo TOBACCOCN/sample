@@ -10,37 +10,36 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class ThreadJoinTest {
 
-    private void startChildThread() {
-        new Thread(() -> {
+    private Thread newThread(Thread joined) {
+        return new Thread(() -> {
             try {
-                TimeUnit.SECONDS.sleep(10);
+                if (joined != null) {
+                    joined.join();
+                }
+                TimeUnit.SECONDS.sleep(2);
                 String name = Thread.currentThread().getName();
                 log.debug(">>>>> THREAD: [{}], RUN_FINISHED", name);
             } catch (InterruptedException e) {
                 ErrorPrintUtil.printErrorMsg(log, e);
             }
-        }).start();
+        });
     }
 
     @Test
     public void join() throws InterruptedException {
-        startChildThread();
-        // 如果不执行 thread.join()，那么基本会先执行主线程的程序，并且很快就退出了，子线程中的程序就不会被执行了
-        // thread.join();
-        // Thread.currentThread().join(); 用于阻塞主线程不让主线程退出
-        Thread.currentThread().join();
-        String name = Thread.currentThread().getName();
-        log.debug(">>>>> THREAD: [{}], RUN_FINISHED", name);
-    }
+        Thread t1 = newThread(null);
+        t1.start();
+        Thread t2  = newThread(t1);
+        t2.start();
+        Thread t3  = newThread(t2);
+        t3.start();
 
-    @Test
-    public void countdownLatch() throws InterruptedException {
-        CountDownLatch countDownLatch = new CountDownLatch(1);
-        startChildThread();
-        // 如果不执行 thread.join()，那么基本会先执行主线程的程序，并且很快就退出了，子线程中的程序就不会被执行了
-        // thread.join();
-        // Thread.currentThread().join(); 用于阻塞主线程不让主线程退出
-        countDownLatch.await();
+        // 等待 t3 执行完
+        t3.join();
+
+        // 用于阻塞主线程不让主线程退出
+        // Thread.currentThread().join();
+
         String name = Thread.currentThread().getName();
         log.debug(">>>>> THREAD: [{}], RUN_FINISHED", name);
     }
