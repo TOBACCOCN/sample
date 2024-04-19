@@ -8,8 +8,6 @@ import java.util.concurrent.Semaphore;
 @Slf4j
 public class SemaphoreTest {
 
-
-
 	@Test
 	public void test() throws InterruptedException {
 		Semaphore semaphore = new Semaphore(3);

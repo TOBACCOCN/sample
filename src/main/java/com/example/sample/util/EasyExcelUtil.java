@@ -5,7 +5,6 @@ import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.metadata.BaseRowModel;
 import com.alibaba.excel.metadata.Sheet;
 import com.example.sample.base.OrderModel;
-import com.example.sample.base.SimpleStream;
 import com.example.sample.base.UserModel;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,7 +13,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.time.Clock;
 import java.util.*;
 
@@ -26,12 +24,12 @@ public class EasyExcelUtil {
     @SuppressWarnings("unchecked")
     public static void writeExcel(OutputStream outputStream, Map<String, List<? extends BaseRowModel>> map) throws IOException {
         ExcelWriter writer = EasyExcelFactory.getWriter(outputStream);
-        SimpleStream.forEach(map, (index, entry) -> {
-            Type type = ((ParameterizedType) entry.getValue().getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-            Sheet sheet = new Sheet(index, 0, (Class) type);
-            sheet.setSheetName((String) entry.getKey());
-            writer.write((List) entry.getValue(), sheet);
-        });
+        // SimpleStream.forEach(map, (index, entry) -> {
+        //     Type type = ((ParameterizedType) entry.getValue().getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+        //     Sheet sheet = new Sheet(index, 0, (Class) type);
+        //     sheet.setSheetName((String) entry.getKey());
+        //     writer.write((List) entry.getValue(), sheet);
+        // });
         //
         // int i = 0;
         // for (Map.Entry<String, List<? extends BaseRowModel>> entry : map.entrySet()) {
@@ -45,6 +43,7 @@ public class EasyExcelUtil {
         final int[] x = {0};
         map.forEach((key, value) -> {
             int a = ++x[0];
+            log.info("{}", ((ParameterizedType) value.getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
             Sheet sheet = new Sheet(a, 0, (Class<? extends BaseRowModel>) ((ParameterizedType) value.getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
             sheet.setSheetName(key);
             writer.write(value, sheet);
@@ -55,7 +54,7 @@ public class EasyExcelUtil {
     }
 
     public static void main(String[] args) throws IOException {
-        OutputStream outputStream = new FileOutputStream(new File("D:/users.xlsx"));
+        OutputStream outputStream = new FileOutputStream(new File("D:/users_orders.xlsx"));
         Map<String, List<? extends BaseRowModel>> map = new HashMap<>();
         List<UserModel> users = new ArrayList<UserModel>(){};
         users.add(new UserModel("zhangsan", 18, "beijing"));

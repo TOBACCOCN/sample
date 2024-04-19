@@ -15,11 +15,34 @@ public class NyPizza extends Pizza {
         }
     }
 
+    public NyPizza() {
+
+    }
+
     NyPizza(Builder builder) {
         super(builder);
     }
 
+    public interface a {
+        void method();
+    }
+
+    public interface b extends a {
+
+    }
+
+    public abstract class c implements a {
+        abstract void print();
+
+        private void function() {}
+    }
+    public abstract class d extends c {
+
+    }
+
+
     public static void main(String[] args) {
+        Pizza p = new Pizza(){};
         String o = "abc";
         String s = String.valueOf(o);
         String s1 = new String(o);

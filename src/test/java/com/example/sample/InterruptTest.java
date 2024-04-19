@@ -13,101 +13,31 @@ public class InterruptTest {
 
 	@Test
 	public void canNotBeInterruptedWhileSynchronizeTryingLocking() throws InterruptedException {
-		Lock lock = new ReentrantLock();
-		Condition condition1 = lock.newCondition();
-		Condition condition2 = lock.newCondition();
-		Condition condition3 = lock.newCondition();
-		Condition condition4 = lock.newCondition();
-
-		final int[] num = {0};
-
-		Thread t = new Thread(() -> {
-			lock.lock();
-			try {
-				num[0] = 1;
-				condition1.signal();
-			} finally {
-				lock.unlock();
-			}
-			synchronized (InterruptTest.this) {
+		Object object = new Object();
+		Runnable runnable = () -> {
+			synchronized (object) {
 				try {
-					TimeUnit.SECONDS.sleep(10);
+					log.info("thread [{}] running", Thread.currentThread().getName());  // InterruptedException 发生在 t2 的这一句 log 之后说明 synchronized 没获取到锁不会被中断，若发生在这一句之前说明可中断
+					Thread.sleep(10000);
+					log.info("thread finished");
 				} catch (InterruptedException e) {
 					throw new RuntimeException(e);
 				}
 			}
-			log.info("t synchronized released");
+		};
 
-			lock.lock();
-			try {
-				while (num[0] != 3) {
-					condition3.await();
-				}
-				num[0] = 4;
-				condition4.signal();
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			} finally {
-				lock.unlock();
-			}
-		});
-
-		Thread t1 = new Thread(() -> {
-			lock.lock();
-			try {
-				while (num[0] != 1) {
-					condition1.await();
-				}
-				num[0] = 2;
-				condition2.signal();
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			} finally {
-				lock.unlock();
-			}
-
-			synchronized (InterruptTest.this) {
-				log.info("t1 synchronized lock get success");
-				try {
-					TimeUnit.SECONDS.sleep(10);
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
-			}
-		});
-
-		t.start();
+		Thread t1 =new Thread(runnable, "t1");
 		t1.start();
+		Thread.sleep(1000);
 
-		lock.lock();
-		try {
-			while (num[0] != 2) {
-				condition2.await();
-			}
-			t1.interrupt();
-			log.info("interrupt t1 before t1 synchronize try locking...");
-			num[0] = 3;
-			condition3.signal();
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		} finally {
-			lock.unlock();
-		}
 
-		lock.lock();
-		try {
-			while (num[0] != 4) {
-				condition4.await();
-			}
-			t1.interrupt();
-			log.info("interrupt t1 after t1 synchronize get lock success...");
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		} finally {
-			lock.unlock();
-		}
+		Thread t2 =new Thread(runnable, "t2");
+		t2.start();
+		log.info("before interrupt");
+		t2.interrupt();
+		log.info("after interrupt");
 
-		t1.join();
+		Thread.currentThread().join();
 	}
 
 	@Test
@@ -125,7 +55,7 @@ public class InterruptTest {
 		Thread t1 = new Thread(() -> {
 			Lock lock = new ReentrantLock();
 			lock.lock();
-			log.info("lock get");
+			log.info("lock got");
 		});
 		t1.start();
 		t1.interrupt();

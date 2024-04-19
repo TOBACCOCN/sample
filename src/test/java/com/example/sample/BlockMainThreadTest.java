@@ -45,6 +45,7 @@ public class BlockMainThreadTest {
         Condition condition = reentrantLock.newCondition();
         new Thread(() -> {
             try {
+                log.info("daemon thread");
                 reentrantLock.lock();
                 TimeUnit.SECONDS.sleep(5);
                 log.info(">>>>> THREAD_NAME: [{}]", Thread.currentThread().getName());
@@ -55,6 +56,7 @@ public class BlockMainThreadTest {
                 reentrantLock.unlock();
             }
         }).start();
+        log.info("main thread");
         reentrantLock.lock();
         condition.await();
         reentrantLock.unlock();

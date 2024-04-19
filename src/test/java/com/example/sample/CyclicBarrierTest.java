@@ -4,8 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
 
+// 多等一
 @Slf4j
 public class CyclicBarrierTest {
 
@@ -16,25 +18,41 @@ public class CyclicBarrierTest {
 
     @Test
     public void test() throws InterruptedException {
+        CountDownLatch countDownLatch = new CountDownLatch(22);
         CyclicBarrier barrier =new CyclicBarrier(22, () -> {
             log.info("运动员到齐，比赛开始");
         });
 
+        log.info("上半场...");
+        start(barrier, countDownLatch);
+
+        countDownLatch.await();
+        barrier.reset();
+
+        log.info("下半场...");
+        start(barrier, null);
+
+        Thread.currentThread().join();
+    }
+
+    private void start(CyclicBarrier barrier, CountDownLatch countDownLatch) {
         for (int i = 0; i < 22; i++) {
             int finalI = i;
             new Thread(() -> {
-                log.info(sportsMans[finalI] + "出场");
+                // log.info(sportsMans[finalI] + "出场");
                 try {
                     barrier.await();
                     // await() 后的代码需要等到 barrier 的 action 执行完才会触发
                     log.info(sportsMans[finalI] + actions[finalI]);
+
+                    if (countDownLatch != null) {
+                        countDownLatch.countDown();
+                    }
                 } catch (InterruptedException | BrokenBarrierException e) {
                     throw new RuntimeException(e);
                 }
             }).start();
         }
-
-        Thread.currentThread().join();
     }
 
 }

@@ -1,12 +1,12 @@
 package com.example.sample;
 
-import com.example.sample.util.ErrorPrintUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+// 一等多
 @Slf4j
 public class CountDownLatchTest {
 
